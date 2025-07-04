@@ -43,7 +43,7 @@ function MobileNavbar() {
             </Button>
           </SheetTrigger>
           <SheetContent className="w-[400px] sm:w-[540px]" side="left">
-            <div className="flex flex-col w-full text-center gap-1 justify-center pt-2.5">
+            <div className="flex flex-col w-full text-center gap-1 justify-center pt-4 ">
               <Logo />
               <div className="pt-6 flex w-full flex-col gap-2">
                 {items.map((item) => (
