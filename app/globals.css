@@ -21,6 +21,13 @@
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+  --color-chart-6: #fbbf24;
+  --color-chart-7: #3b82f6;
+
+  /* Link chart-6 and 7 to new names for clarity */
+  --color-june: var(--color-chart-6);
+  --color-july: var(--color-chart-7);
+
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -68,6 +75,8 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
+  --chart-6: #fbbf24;
+  --chart-7: #3b82f6;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -118,5 +127,10 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  .recharts-tooltip-wrapper {
+    white-space: normal !important;
+    max-width: 200px; /* adjust width as needed */
+    word-break: break-word;
   }
 }

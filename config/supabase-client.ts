@@ -1,6 +1,14 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseURL = process.env.SUPABASE_PROJECT_URL as string
-const supabaseKey = process.env.SUPABASE_API_KEY as string
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export const supabase =  createClient(supabaseURL, supabaseKey)
+export function createSupabaseClient(token?: string | null): SupabaseClient {
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    global: {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    },
+  });
+}

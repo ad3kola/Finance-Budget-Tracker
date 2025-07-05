@@ -43,9 +43,14 @@ const currencies = [
   },
 ];
 
-export default function CurrencyComboBox() {
+export default function CurrencyComboBox({
+  value,
+  onValueChange,
+}: {
+  value: string;
+  onValueChange: (val: string) => void;
+}) {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -73,7 +78,7 @@ export default function CurrencyComboBox() {
                   key={currency.value}
                   value={currency.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
+                    onValueChange(currentValue);
                     setOpen(false);
                   }}
                 >

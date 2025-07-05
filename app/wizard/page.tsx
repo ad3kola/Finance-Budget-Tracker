@@ -1,4 +1,4 @@
-// 'use client'
+'use client'
 
 import CurrencyComboBox from "@/components/CurrencyComboBox";
 import Logo from "@/components/Logo";
@@ -11,45 +11,60 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { supabase } from "@/config/supabase-client";
-import { currentUser } from "@clerk/nextjs/server";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-// import { useState } from "react";
+import { createSupabaseClient } from "@/config/supabase-client"; // change this to a factory function
+import { useUser, useAuth } from "@clerk/nextjs";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { redirect, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
-async function page() {
-  const user = await currentUser();
+function Page() {
+  const { user } = useUser();
+  const { getToken, isSignedIn } = useAuth();
+  const router = useRouter();
+
   if (!user) {
     redirect("/sign-in");
   }
 
-//   const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null);
+  const [selectedCurrency, setSelectedCurrency] = useState<string>("");
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
 
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    const userData = {
-        user_id: user.id,
-        full_name: user.fullName,
-        email: user.primaryEmailAddress?.emailAddress,
-        profile_image: user.imageUrl,
-        currency: '',
-
+  // Initialize Supabase client with Clerk JWT token
+  useEffect(() => {
+    async function initSupabase() {
+      if (isSignedIn) {
+        const token = await getToken({ template: "supabase" });
+        const client = createSupabaseClient(token);
+        setSupabase(client);
+      }
     }
-    await supabase.from("user_profiles").upsert(userData)
-  }
+    initSupabase();
+  }, [isSignedIn, getToken]);
+
+  const handleSubmit = async () => {
+    if (!user || !selectedCurrency || !supabase) return;
+
+    const userData = {
+      user_id: user.id,
+      full_name: user.fullName ?? user.username,
+      email: user.primaryEmailAddress?.emailAddress,
+      profile_image: user.imageUrl,
+      currency: selectedCurrency,
+    };
+
+    const { error } = await supabase.from("user_profiles").upsert(userData);
+    if (!error) router.push("/");
+  };
 
   return (
     <div className="container flex max-w-2xl flex-col items-center justify-between gap-4 px-4">
       <div>
         <h1 className="text-center text-2xl">
           Welcome,{" "}
-          <span className="ml-2 font-bold">
-            {user.firstName ?? "Adekola"}!👋
-          </span>
+          <span className="ml-2 font-bold">{user.firstName ?? "Adekola"}!👋</span>
         </h1>
-        <h2 className="mt-4 text-center text0base text-muted-forgeroung">
-          Let &apos;s get started by setting up your currency
+        <h2 className="mt-4 text-center text-base text-muted-foreground">
+          Let&apos;s get started by setting up your currency
         </h2>
         <h3 className="mt-2 text-center text-sm text-muted-foreground">
           You can change these settings at any time.
@@ -59,19 +74,15 @@ async function page() {
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Currency</CardTitle>
-          <CardDescription>
-            Set your default currency for transactions
-          </CardDescription>
+          <CardDescription>Set your default currency for transactions</CardDescription>
         </CardHeader>
         <CardContent>
-            <CurrencyComboBox />
+          <CurrencyComboBox value={selectedCurrency} onValueChange={setSelectedCurrency} />
         </CardContent>
       </Card>
       <Separator />
-      <Button className="w-full" asChild>
-        <Link href={"/"}>
-          I&apos;m done! Take me to the dashboard
-        </Link>
+      <Button onClick={handleSubmit} className="w-full">
+        I&apos;m done! Take me to the dashboard
       </Button>
       <div className="mt-8">
         <Logo />
@@ -80,4 +91,4 @@ async function page() {
   );
 }
 
-export default page;
+export default Page;
