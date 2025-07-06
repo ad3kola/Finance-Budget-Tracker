@@ -19,36 +19,37 @@ import { Separator } from "../ui/separator";
 function Stats() {
   const data: StatsProps[] = [
     {
-      title: "Earnings",
-      value: 660.45,
+      title: "Earnings Overview",
+      value: 0,
       Icon: Banknote,
-      roi: 0.18,
-      valueChange: 115.9,
+      roi: 0,
+      valueChange: 0,
     },
     {
-      title: "Savings",
-      value: 500.55,
-      Icon: WalletIcon,
-      roi: 0.18,
-      valueChange: 115.9,
-    },
-    {
-      title: "Spendings",
-      value: 945.34,
+      title: "Total Expenses",
+      value: 0,
       Icon: ShoppingCartIcon,
-      roi: 0.18,
-      valueChange: 115.9,
+      roi: 0,
+      valueChange: 0,
     },
     {
-      title: "Investments",
-      value: 1430.9,
+      title: "Current Savings",
+      value: 0,
+      Icon: WalletIcon,
+      roi: 0,
+      valueChange: 0,
+    },
+
+    {
+      title: "Investment Portfolio",
+      value: 0,
       Icon: PackagePlusIcon,
-      roi: 0.18,
-      valueChange: 115.9,
+      roi: 0,
+      valueChange: 0,
     },
   ];
   return (
-    <div className="grid grid-auto-cols-fr grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-auto-cols-fr grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
       {data.map((item) => (
         <StatCard key={item.title} {...item} />
       ))}
@@ -83,7 +84,7 @@ function StatCard({ title, value, Icon, roi, valueChange }: StatsProps) {
         <Separator className="" />
         <div className="flex items-center w-full gap-2">
           <span className="inline-flex text-xs items-center rounded-sm bg-amber-50 px-2 py-0.5 font-medium text-amber-700 ring-1 ring-amber-600/10 ring-inset">
-            +{valueChange}
+            +${valueChange}
           </span>
           <span className="inline-flex text-xs items-center rounded-sm bg-amber-50 px-2 py-0.5 font-medium text-amber-700 ring-1 ring-amber-600/10 ring-inset">
             {roi * 100}%

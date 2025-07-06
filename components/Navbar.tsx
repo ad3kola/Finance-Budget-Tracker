@@ -1,15 +1,37 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import React, {
+  useEffect,
+  useState,
+} from "react";
+
 import { Button, buttonVariants } from "./ui/button";
 import { cn } from "@/lib/utils";
 import ModeToggle from "./ModeToggle";
-import { UserButton } from "@clerk/nextjs";
+import { useAuth, UserButton, useUser } from "@clerk/nextjs";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
-import { MenuIcon } from "lucide-react";
+
 import Logo from "./Logo";
+import { z } from "zod";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+
+import { useForm, UseFormReturn } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { transactionSchema } from "@/config/zod/transactions.schema";
+import { MenuIcon } from "lucide-react";
 
 interface Items {
   label: string;
@@ -21,16 +43,38 @@ const items: Items[] = [
   { label: "Transactions", link: "/transactions" },
   { label: "Manage", link: "/manage" },
 ];
+
 function Navbar() {
+  const form = useForm<z.infer<typeof transactionSchema>>({
+    resolver: zodResolver(transactionSchema),
+    defaultValues: {
+      amount: 0.0,
+      category: "",
+      date: new Date(),
+      description: "",
+      type: "income",
+    },
+  });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<z.infer<typeof transactionSchema>>();
+
   return (
     <>
-      <DesktopNavbar />
-      <MobileNavbar />
+      <DesktopNavbar form={form} />
+      <MobileNavbar form={form} />
     </>
   );
 }
-
-function MobileNavbar() {
+function MobileNavbar({
+  form,
+}: {
+  form: UseFormReturn<z.infer<typeof transactionSchema>>;
+}) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
@@ -51,7 +95,7 @@ function MobileNavbar() {
                     key={item.label}
                     label={item.label}
                     link={item.link}
-                    clickCallback={() => setIsOpen(prev => !prev)}
+                    clickCallback={() => setIsOpen((prev) => !prev)}
                   />
                 ))}
               </div>
@@ -59,6 +103,7 @@ function MobileNavbar() {
           </SheetContent>
         </Sheet>
         <div className="flex items-center gap-4">
+        
           <ModeToggle />
           <UserButton afterSignOutUrl="/sign-in" />
         </div>
@@ -67,7 +112,14 @@ function MobileNavbar() {
   );
 }
 
-function DesktopNavbar() {
+function DesktopNavbar({
+  form,
+}: {
+  form: UseFormReturn<z.infer<typeof transactionSchema>>;
+}) {
+  const { user } = useUser();
+  const { getToken, isSignedIn } = useAuth();
+
   return (
     <div className="hidden border-separate border-b bg-background md:block w-full shadow-amber-200 shadow-xs">
       <nav className="w-full flex items-center justify-between px-8 py-2">
@@ -95,6 +147,9 @@ function DesktopNavbar() {
 function NavbarItem({ link, label, clickCallback }: Items) {
   const pathname = usePathname();
   const isActive = pathname === link;
+  useEffect(() => {
+    console.log("Current pathname:", pathname);
+  }, [pathname]);
   return (
     <div className="relative px-3 flex items-center">
       <Link
@@ -107,7 +162,7 @@ function NavbarItem({ link, label, clickCallback }: Items) {
           isActive && "text-foreground"
         )}
         onClick={() => {
-            if (clickCallback) clickCallback()
+          if (clickCallback) clickCallback();
         }}
       >
         {label}

@@ -29,7 +29,6 @@ function Page() {
   const [selectedCurrency, setSelectedCurrency] = useState<string>("");
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
 
-  // Initialize Supabase client with Clerk JWT token
   useEffect(() => {
     async function initSupabase() {
       if (isSignedIn) {
