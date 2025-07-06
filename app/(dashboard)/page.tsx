@@ -441,8 +441,7 @@ function page() {
       </div>
       {/* 3rd Row */}
       <div className="w-full">
-        {" "}
-        <RecentTransactions />
+        <RecentTransactions data={transactions}/>
       </div>
     </div>
   );
