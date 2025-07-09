@@ -116,6 +116,7 @@ export default function UpdateDialogBox({ id }: { id: number }) {
   useEffect(() => {
     fetchTransactionDataByID(id);
   }, [id])
+  
   const form = useForm<z.infer<typeof transactionSchema>>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {

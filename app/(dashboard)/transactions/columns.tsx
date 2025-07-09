@@ -11,21 +11,25 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+// import {
+//   AlertDialog,
+//   AlertDialogAction,
+//   AlertDialogCancel,
+//   AlertDialogContent,
+//   AlertDialogFooter,
+//   AlertDialogTrigger,
+// } from "@/components/ui/alert-dialog";
 import { TransactionsProps } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 
-import { ClipboardEditIcon, MoreHorizontal, TrashIcon } from "lucide-react";
-import UpdateDialogBox from "@/components/transactions/UpdateDialogBox";
+import { 
+  // ClipboardEditIcon, 
+  // TrashIcon ,
+  MoreHorizontal, 
+  } from "lucide-react";
+// import UpdateDialogBox from "@/components/transactions/UpdateDialogBox";
 
 export const columns = (): // onDelete: (id: number) => void
 ColumnDef<TransactionsProps>[] => [

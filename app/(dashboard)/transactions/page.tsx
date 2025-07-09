@@ -24,31 +24,31 @@ export default function DemoPage() {
     if (data) setTransactions(data);
   };
 
-  const updateTransactionByID = async (id: number) => {
-    const token = await getToken({ template: "supabase" });
-    const supabase = createSupabaseClient(token);
-    console.log(id);
-    await supabase
-      .from("transactions")
-      .delete()
-      .eq('id', id);
+  // const updateTransactionByID = async (id: number) => {
+  //   const token = await getToken({ template: "supabase" });
+  //   const supabase = createSupabaseClient(token);
+  //   console.log(id);
+  //   await supabase
+  //     .from("transactions")
+  //     .delete()
+  //     .eq('id', id);
 
-    fetchTransactions();
-    console.log('done')
-  };
+  //   fetchTransactions();
+  //   console.log('done')
+  // };
 
-  const deleteTransactionByID = async (id: number) => {
-    const token = await getToken({ template: "supabase" });
-    const supabase = createSupabaseClient(token);
-    console.log(id);
-    await supabase
-      .from("transactions")
-      .delete()
-      .eq('id', id);
+  // const deleteTransactionByID = async (id: number) => {
+  //   const token = await getToken({ template: "supabase" });
+  //   const supabase = createSupabaseClient(token);
+  //   console.log(id);
+  //   await supabase
+  //     .from("transactions")
+  //     .delete()
+  //     .eq('id', id);
 
-    fetchTransactions();
-    console.log('done')
-  };
+  //   fetchTransactions();
+  //   console.log('done')
+  // };
 
   useEffect(() => {
     fetchTransactions();
