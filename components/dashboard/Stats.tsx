@@ -13,10 +13,15 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Button } from "../ui/button";
-import { StatsProps } from "@/lib/types";
+import { StatsProps, TransactionsProps } from "@/lib/types";
 import { Separator } from "../ui/separator";
 
-function Stats() {
+function Stats({transactions,
+  month,
+}: {
+  transactions: TransactionsProps[];
+  month: Date;}) {
+    console.log(month, transactions)
   const data: StatsProps[] = [
     {
       title: "Earnings Overview",
@@ -78,7 +83,7 @@ function StatCard({ title, value, Icon, roi, valueChange }: StatsProps) {
         </div>
       </CardHeader>
       <CardContent className="-mt-5">
-        <h3 className="font-bold text-3xl">${value.toFixed(2)}</h3>
+        <h3 className="font-bold text-3xl">${value.toFixed(2).toLocaleString()}</h3>
       </CardContent>
       <CardFooter className="flex flex-col -mt-3 w-full gap-2">
         <Separator className="" />

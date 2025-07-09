@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -12,11 +13,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="dark">
-      <body
-        className={`antialiased`}
-      >
+      <body className={`antialiased`}>
         <div className="h-screen w-full flex items-center justify-center">
           {children}
+       
         </div>
       </body>
     </html>

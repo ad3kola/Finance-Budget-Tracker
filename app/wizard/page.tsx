@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import CurrencyComboBox from "@/components/CurrencyComboBox";
 import Logo from "@/components/Logo";
@@ -16,6 +16,7 @@ import { useUser, useAuth } from "@clerk/nextjs";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { redirect, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 function Page() {
   const { user } = useUser();
@@ -51,8 +52,26 @@ function Page() {
       currency: selectedCurrency,
     };
 
-    const { error } = await supabase.from("user_profiles").upsert(userData);
-    if (!error) router.push("/");
+    try {
+      await toast.promise(
+        (async () => {
+          const { error } = await supabase
+            .from("user_profiles")
+            .upsert(userData, { onConflict: "user_id" });
+
+          if (error) throw new Error(error.message);
+        })(),
+        {
+          loading: "Saving your preferences...",
+          success: "Transaction has been logged",
+          error: "Error logging transaction",
+        }
+      );
+
+      router.push("/");
+    } catch (error) {
+      console.error("Upsert error:", error);
+    }
   };
 
   return (
@@ -60,7 +79,9 @@ function Page() {
       <div>
         <h1 className="text-center text-2xl">
           Welcome,{" "}
-          <span className="ml-2 font-bold">{user.firstName ?? "Adekola"}!👋</span>
+          <span className="ml-2 font-bold">
+            {user.firstName ?? "Adekola"}!👋
+          </span>
         </h1>
         <h2 className="mt-4 text-center text-base text-muted-foreground">
           Let&apos;s get started by setting up your currency
@@ -73,10 +94,15 @@ function Page() {
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Currency</CardTitle>
-          <CardDescription>Set your default currency for transactions</CardDescription>
+          <CardDescription>
+            Set your default currency for transactions
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <CurrencyComboBox value={selectedCurrency} onValueChange={setSelectedCurrency} />
+          <CurrencyComboBox
+            value={selectedCurrency}
+            onValueChange={setSelectedCurrency}
+          />
         </CardContent>
       </Card>
       <Separator />

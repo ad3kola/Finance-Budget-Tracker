@@ -4,8 +4,7 @@ import React, { ReactNode } from "react";
 function layout({ children }: { children: ReactNode }) {
   return (
     <div
-      className="relative flex h-screen w-full mx-auto flex-col">
-    
+      className="relative flex h-screen w-full mx-auto flex-col overflow-y-auto">
       <Navbar />
       {children}
     </div>

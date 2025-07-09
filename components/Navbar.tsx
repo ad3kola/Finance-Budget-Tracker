@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React, {
   useEffect,
   useState,
@@ -10,27 +10,10 @@ import React, {
 import { Button, buttonVariants } from "./ui/button";
 import { cn } from "@/lib/utils";
 import ModeToggle from "./ModeToggle";
-import { useAuth, UserButton, useUser } from "@clerk/nextjs";
+import { UserButton } from "@clerk/nextjs";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 
 import Logo from "./Logo";
-import { z } from "zod";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-
-import { useForm, UseFormReturn } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { transactionSchema } from "@/config/zod/transactions.schema";
 import { MenuIcon } from "lucide-react";
 
 interface Items {
@@ -45,36 +28,14 @@ const items: Items[] = [
 ];
 
 function Navbar() {
-  const form = useForm<z.infer<typeof transactionSchema>>({
-    resolver: zodResolver(transactionSchema),
-    defaultValues: {
-      amount: 0.0,
-      category: "",
-      date: new Date(),
-      description: "",
-      type: "income",
-    },
-  });
-  const {
-    register,
-    handleSubmit,
-    watch,
-    reset,
-    formState: { errors },
-  } = useForm<z.infer<typeof transactionSchema>>();
-
   return (
     <>
-      <DesktopNavbar form={form} />
-      <MobileNavbar form={form} />
+      <DesktopNavbar />
+      <MobileNavbar />
     </>
   );
 }
-function MobileNavbar({
-  form,
-}: {
-  form: UseFormReturn<z.infer<typeof transactionSchema>>;
-}) {
+function MobileNavbar() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
@@ -112,13 +73,7 @@ function MobileNavbar({
   );
 }
 
-function DesktopNavbar({
-  form,
-}: {
-  form: UseFormReturn<z.infer<typeof transactionSchema>>;
-}) {
-  const { user } = useUser();
-  const { getToken, isSignedIn } = useAuth();
+function DesktopNavbar() {
 
   return (
     <div className="hidden border-separate border-b bg-background md:block w-full shadow-amber-200 shadow-xs">
