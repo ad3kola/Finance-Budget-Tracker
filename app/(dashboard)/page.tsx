@@ -97,7 +97,7 @@ const categories: CategoryMap = {
 
 import Activities from "@/components/dashboard/Activities";
 import RecentTransactions from "@/components/dashboard/Recents";
-import SalesOverview from "@/components/dashboard/SalesOverview";
+// import SalesOverview from "@/components/dashboard/SalesOverview";
 import Stats from "@/components/dashboard/Stats";
 import { TransactionsProps } from "@/lib/types";
 import { useEffect, useState } from "react";
@@ -484,7 +484,7 @@ full data-[state=active]:bg-green-500!"
       {/* 2nd Row */}
       <div className="w-full grid grid-auto-cols-fr grid-cols-1 xl:grid-cols-3 gap-3">
         <Activities />
-        <SalesOverview />
+        {/* <SalesOverview /> */}
       </div>
       {/* 3rd Row */}
       <div className="w-full">
