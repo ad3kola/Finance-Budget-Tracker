@@ -1,6 +1,3 @@
-"use client";
-
-import { format } from "date-fns";
 
 import {
   Table,
@@ -48,7 +45,7 @@ export default function RecentTransactions({
                 ) => (
                   <TableRow key={index} className="h-12">
                     <TableCell className="w-[150px] font-medium">
-                      {format(date, "PPP")}
+                      {date}
                     </TableCell>
                     <TableCell
                       className={cn(
