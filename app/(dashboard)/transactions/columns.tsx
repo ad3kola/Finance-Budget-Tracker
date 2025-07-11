@@ -33,6 +33,7 @@ import {
 
 export const columns = (): // onDelete: (id: number) => void
 ColumnDef<TransactionsProps>[] => [
+  
   {
     id: "select",
     header: ({ table }) => (

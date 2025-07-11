@@ -19,17 +19,18 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { fetchBarCharts } from "@/lib/data/dashboard/fetchChartsData";
+import { useSupabaseClient } from "@/lib/data/client";
+import { useEffect, useState } from "react";
 
 export const description = "A multiple bar chart";
 
-const chartData = [
-  { month: "January", income: 186, expenses: 80 },
-  { month: "February", income: 305, expenses: 200 },
-  { month: "March", income: 237, expenses: 120 },
-  { month: "April", income: 73, expenses: 190 },
-  { month: "May", income: 209, expenses: 130 },
-  { month: "June", income: 214, expenses: 140 },
-];
+interface ChartDataProps {
+  month: string
+  income: number
+  expenses: number
+}
+
 
 const chartConfig = {
   income: {
@@ -43,6 +44,21 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function Activities() {
+  const { getClient } = useSupabaseClient();
+
+  const [chartData, setChartData] = useState<ChartDataProps[] | []>([])
+
+  useEffect(() => {
+    const fetch = async () => {
+      const supabase = await getClient();
+      const data = await fetchBarCharts(supabase);
+      console.log(data)
+      setChartData(data)
+    };
+
+    fetch();
+  }, [getClient]);
+
   return (
     <Card className="col-span-2">
       <CardHeader className="flex flex-col sm:md:flex-row w-full items-start justify-between gap-4">

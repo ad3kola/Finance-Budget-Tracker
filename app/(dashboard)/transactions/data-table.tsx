@@ -6,6 +6,7 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   useReactTable,
+  getPaginationRowModel,
   VisibilityState,
   ColumnFiltersState,
 } from "@tanstack/react-table";
@@ -46,6 +47,7 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    getPaginationRowModel: getPaginationRowModel(),
 
     state: {
       columnFilters,
@@ -58,9 +60,7 @@ export function DataTable<TData, TValue>({
       <div className="w-full flex items-center gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              Columns
-            </Button>
+            <Button variant="outline">Columns</Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {table
@@ -94,9 +94,19 @@ export function DataTable<TData, TValue>({
             className="max-w-sm text-sm font-medium"
           />
         </div>
-      </div>
+        <div className="flex items-center py-4">
+          <Input
+            placeholder="Filter by month..."
+            value={(table.getColumn("month")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("month")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm text-sm font-medium"
+          />
+        </div>
+      </div> 
       <div className="w-full rounded-md border relative">
-        <div className='absolute h-full w-5 bg-gradient-to-r via-background to-background top-0 right-0 z-50' />
+        <div className="absolute h-full w-5 bg-gradient-to-r via-background to-background top-0 right-0 z-50" />
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -146,6 +156,24 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py\-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
       </div>
     </div>
   );

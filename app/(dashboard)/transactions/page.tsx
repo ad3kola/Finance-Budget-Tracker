@@ -59,7 +59,7 @@ export default function DemoPage() {
   });
 
   return (
-    <div className="mx-auto p-2 md:p-4 w-full overflow-x-hidden">
+    <div className="mx-auto p-4 w-full overflow-x-hidden">
       <DataTable columns={columns()} data={transactions} />
     </div>
   );

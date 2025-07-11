@@ -32,8 +32,8 @@ export default function RecentTransactions({
               <TableHead className="w-[150px]">Date</TableHead>
               <TableHead className="w-[130px]">Type</TableHead>
               <TableHead className="w-[130px]">Category</TableHead>
-              <TableHead className="hidden lg:flex">Description</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
+              <TableHead className="hidden lg:table-cell">Description</TableHead>
+              <TableHead className="text-center">Amount</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -63,12 +63,12 @@ export default function RecentTransactions({
                         {category}
                       </div>
                     </TableCell>
-                    <TableCell className="hidden lg:flex">
+                    <TableCell className="hidden lg:flex max-w-96 truncate">
                       {description}
                     </TableCell>
                     <TableCell className="text-right font-bold w-40">
-                      <span className={cn("w-40 bg-input/30 px-4 py-1.5 rounded-md text-center font-medium tracking-wide", type == "Income" ? "text-green-500" : "text-red-500")}>
-                        ${amount}
+                      <span className={cn("inline-block w-full bg-input/30 px-4 py-1.5 rounded-md text-center font-medium tracking-wide", type == "income" ? "text-green-500" : "text-red-500")}>
+                        ${amount.toFixed(2).toLocaleString()}
                       </span>
                     </TableCell>
                   </TableRow>
