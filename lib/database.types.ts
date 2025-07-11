@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          created_at: string
+          Icon: string
+          id: number
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          Icon: string
+          id?: number
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          Icon?: string
+          id?: number
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -30,7 +54,7 @@ export type Database = {
           category: string
           created_at?: string
           date: string
-          description?: string
+          description: string
           id?: number
           type: string
           user_id: string

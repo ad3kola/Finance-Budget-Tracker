@@ -203,16 +203,19 @@ export default function CreateCategory({
     const token = await getToken({ template: "supabase" });
     const supabase = createSupabaseClient(token);
 
+    const categoryData = {
+        ...values,
+        user_id: user.id,
+    }
     const { data, error } = await supabase
       .from("categories")
-      .insert([values])
+      .insert([categoryData])
       .single();
 
     if (error) {
       console.error("Error creating category: ", error.message);
     } else {
       reset();
-      onSuccess(); // close modal
     }
     console.log(data);
   }
