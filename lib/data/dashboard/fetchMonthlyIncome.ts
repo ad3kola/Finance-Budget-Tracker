@@ -2,12 +2,18 @@ import { Database } from "@/lib/database.types";
 import { SupabaseClient } from "@supabase/supabase-js";
 
 // Utility function to generate distinct pastel colors based on index
-function generateColor() {
-  const hue = Math.floor(Math.random() * 360); // 0–359
-  const saturation = 60 + Math.random() * 30;  // 60–90%
-  const lightness = 60 + Math.random() * 20;   // 60–80%
+function generateColor(index: number) {
+  // Extended color hues: green, teal, cyan, sky blue, blue, indigo, purple, violet
+  const hues = [140, 170, 190, 200, 220, 240, 260, 280];
+  const hue = hues[index % hues.length];
+
+  const saturation = 70 + (index % 2) * 10; // 70–80%
+  const lightness = 50 + (index % 3) * 5;   // 50–60%
+
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
+
+
 
 export default async function fetchMonthlyIncome(
   supabase: SupabaseClient<Database>
@@ -37,10 +43,10 @@ return { total: 0, percentage: 0, breakdown: [] };
   }, {} as Record<string, number>);
 
   // Build result array with color and percentage
-  const breakdown = Object.entries(grouped).map(([category, total]) => ({
+  const breakdown = Object.entries(grouped).map(([category, total], index) => ({
     category,
     total: +total.toFixed(2),
-    color: generateColor(),
+    color: generateColor(index),
     percentage: +(total / totalIncome * 100).toFixed(1),
   }));
 

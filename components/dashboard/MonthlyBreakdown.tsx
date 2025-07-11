@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { useSupabaseClient } from "@/lib/data/client";
-import fetchMonthlyExpenses from "@/lib/data/dashboard/fetchMonthlyExpenses";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -12,10 +11,13 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
-import { PlusCircleIcon } from "lucide-react";
+import { PlusCircleIcon, PlusIcon } from "lucide-react";
+import fetchMonthlyIncome from "@/lib/data/dashboard/fetchMonthlyIncome";
+import fetchMonthlyExpenses from "@/lib/data/dashboard/fetchMonthlyExpenses";
 import CreateDialogBox from "../CreateDialogBox";
+import CreateCategory from "./CreateCategory";
 
-interface Expense {
+interface Income {
   total: number;
   percentage: number;
   breakdown: {
@@ -26,32 +28,50 @@ interface Expense {
   }[];
 }
 
-function MonthlyExpenses() {
+function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
   const { getClient } = useSupabaseClient();
 
-  const [expenseBreakdown, setExpenseBreakdown] = useState<Expense | null>(
-    null
-  );
+  const [data, setData] = useState<Income | null>(null);
   useEffect(() => {
     const fetch = async () => {
       const supabase = await getClient();
-      const res = await fetchMonthlyExpenses(supabase);
-      console.log(res);
-      setExpenseBreakdown(res);
+      if (type == "income") {
+        const res = await fetchMonthlyIncome(supabase);
+        setData(res);
+      }
+      if (type == "expense") {
+        const res = await fetchMonthlyExpenses(supabase);
+        setData(res);
+      }
     };
     fetch();
-  }, [getClient]);
+  }, [getClient, type]);
 
   return (
-    <Card className="col-span-1 w-full">
-      <CardHeader>
-        <CardTitle className="text-xl">Monthly Expenses Breakdown</CardTitle>
+    <Card>
+      <CardHeader className='flex items-center justify-between w-full'>
+        <CardTitle className="text-xl">{`Monthly ${
+          type == "income" ? " Earnings" : "Expenses"
+        } Breakdown`}</CardTitle>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button className="group w-fit cursor-pointer">
+              <PlusIcon className="h-8 w-8 transition-transform duration-300 group-hover:rotate-360 group-hover:scale-125" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <CreateCategory type = {type == 'income' ? 'income' : 'expense'} />
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardHeader>
       <CardContent className="pb-5 h-full px-4">
-        {expenseBreakdown ? (
+        {data ? (
           <>
             <div className="flex h-2 w-full overflow-hidden rounded-full mb-4">
-              {expenseBreakdown.breakdown.map(({ color, percentage }, i) => (
+              {data.breakdown.map(({ color, percentage }, i) => (
                 <div
                   key={i}
                   style={{ width: `${percentage}%`, backgroundColor: color }}
@@ -61,7 +81,7 @@ function MonthlyExpenses() {
             </div>
             <div className="w-full flex flex-col h-full justify-between">
               <div className="w-full flex-grow overflow-y-auto px-2">
-                {expenseBreakdown.breakdown.map(
+                {data.breakdown.map(
                   ({ category, color, total, percentage }) => (
                     <div
                       key={category}
@@ -82,13 +102,14 @@ function MonthlyExpenses() {
                   )
                 )}
               </div>
-              <div className="w-full grid grid-cols-3 h-11 bg-input/30 px-2 rounded-lg">
-                <div className="col-span-2" />
+              <div className="w-full grid grid-cols-3 h-12 bg-input/30 px-2 rounded-lg overflow-y-auto">
+                <div className="col-span-2 flex items-center w-full justify-start gap-3 text-sm font-medium pl-2">
+                  <div className="w-3 h-3 rounded-full bg-white" />
+                  <h3>{`Total ${type == "income" ? "earned" : "spent"}`}</h3>
+                </div>
                 <div className="col-span-1 w-full gap-3 flex items-center justify-between font-medium">
-                  <p className="text-left">
-                    ${expenseBreakdown.total.toFixed(2)}
-                  </p>
-                  <p>{expenseBreakdown.percentage.toFixed(1)}%</p>
+                  <p className="text-left">${data.total.toFixed(2)}</p>
+                  <p>{data.percentage.toFixed(1)}%</p>
                 </div>
               </div>
             </div>
@@ -124,4 +145,4 @@ function MonthlyExpenses() {
   );
 }
 
-export default MonthlyExpenses;
+export default MonthlyBreakdown;

@@ -8,8 +8,7 @@ import { TransactionsProps } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { fetchRecentTransactions } from "@/lib/data/dashboard/fetchTransactions";
 import { useSupabaseClient } from "@/lib/data/client";
-import MonthlyExpenses from "@/components/dashboard/MonthlyExpenses";
-import MonthlyIncome from "@/components/dashboard/MonthlyIncome";
+import MonthlyBreakdown from "@/components/dashboard/MonthlyBreakdown";
 
 function Page() {
   const [recentTransactions, setRecentTransactions] = useState<
@@ -46,11 +45,11 @@ function Page() {
       {/* 2nd Row */}
       <div className="w-full grid grid-auto-cols-fr grid-cols-1 xl:grid-cols-3 gap-3">
         <Activities />
-        <MonthlyExpenses />
+        <MonthlyBreakdown type='income' />
       </div>
       {/* 3rd Row */}
       <div className="w-full grid grid-auto-cols-fr grid-cols-1 xl:grid-cols-3 gap-3">
-        <MonthlyIncome />
+        <MonthlyBreakdown type='expense' />
         <RecentTransactions data={recentTransactions} />
       </div>
     </div>

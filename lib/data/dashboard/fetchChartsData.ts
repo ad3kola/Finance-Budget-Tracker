@@ -5,6 +5,7 @@ export async function fetchBarCharts(supabase: SupabaseClient) {
   const { data, error } = await supabase
     .from("transactions")
     .select("amount, type, date")
+    .order('date', {ascending: true})
 
   if (error) {
     console.error("Fetch error:", error.message);
