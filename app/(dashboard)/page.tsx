@@ -43,12 +43,12 @@ function Page() {
       </div>
 
       {/* 2nd Row */}
-      <div className="w-full grid grid-auto-cols-fr grid-cols-1 xl:grid-cols-3 gap-3">
+      <div className="w-full grid grid-auto-cols-fr grid-cols-1 lg:grid-cols-3 gap-3">
         <Activities />
         <MonthlyBreakdown type='income' />
       </div>
       {/* 3rd Row */}
-      <div className="w-full grid grid-auto-cols-fr grid-cols-1 xl:grid-cols-3 gap-3">
+      <div className="w-full grid grid-auto-cols-fr grid-cols-1 lg:grid-cols-3 gap-3">
         <MonthlyBreakdown type='expense' />
         <RecentTransactions data={recentTransactions} />
       </div>

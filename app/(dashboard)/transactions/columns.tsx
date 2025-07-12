@@ -46,8 +46,8 @@ ColumnDef<TransactionsProps>[] => [
   {
     accessorKey: "date",
     header: () => (
-      <h3>
-        Date <ArrowUpDown />
+      <h3 className='text-sm font-medium flex items-center gap-2'>
+        Date <ArrowUpDown className="h-4 w-4" />
       </h3>
     ),
     cell: ({ row }) => {

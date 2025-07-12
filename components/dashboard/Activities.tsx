@@ -13,6 +13,8 @@ import {
 import {
   ChartConfig,
   ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
@@ -63,63 +65,65 @@ export default function ChartAreaGradient() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-          <ChartContainer config={chartConfig} className="max-h-[400px] w-full">
-            <AreaChart
-              accessibilityLayer
-              data={chartData}
-              margin={{ left: 12, right: 12 }}
-            >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="month"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tickFormatter={(value) => value.slice(0, 3)}
-              />
-              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-              <defs>
-                <linearGradient id="fillIncome" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-income)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-income)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-                <linearGradient id="fillExpenses" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-expenses)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-expenses)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-              </defs>
-              <Area
-                dataKey="expenses"
-                type="natural"
-                fill="url(#fillExpenses)"
-                stroke="var(--color-expenses)"
-                stackId="a"
-              />
-              <Area
-                dataKey="income"
-                type="natural"
-                fill="url(#fillIncome)"
-                stroke="var(--color-income)"
-                stackId="a"
-              />
-            </AreaChart>
-          </ChartContainer>
+        <ChartContainer config={chartConfig} className="max-h-[400px] w-full">
+          <AreaChart
+            accessibilityLayer
+            data={chartData}
+            margin={{ left: 12, right: 12 }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => value.slice(0, 3)}
+            />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+            <ChartLegend content={<ChartLegendContent />} />
+
+            <defs>
+              <linearGradient id="fillIncome" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-income)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-income)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+              <linearGradient id="fillExpenses" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-expenses)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-expenses)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+            </defs>
+            <Area
+              dataKey="expenses"
+              type="natural"
+              fill="url(#fillExpenses)"
+              stroke="var(--color-expenses)"
+              stackId="a"
+            />
+            <Area
+              dataKey="income"
+              type="natural"
+              fill="url(#fillIncome)"
+              stroke="var(--color-income)"
+              stackId="a"
+            />
+          </AreaChart>
+        </ChartContainer>
       </CardContent>
       <CardFooter>
         <div className="flex w-full items-start gap-2 text-sm">

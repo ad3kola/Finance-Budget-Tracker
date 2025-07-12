@@ -37,7 +37,7 @@ export default function RecentTransactions({
           <TableHeader>
             <TableRow>
               <TableHead className="w-[150px]">Date</TableHead>
-              <TableHead className="w-[100px]">Type</TableHead>
+              <TableHead className="w-[150px]">Type</TableHead>
               <TableHead className="">Category</TableHead>
               <TableHead className="hidden lg:table-cell">
                 Description
@@ -51,7 +51,7 @@ export default function RecentTransactions({
                 .slice(0, 5)
                 .map(({ date, category, type, description, amount }, index) => (
                   <TableRow key={index} className="h-12">
-                    <TableCell className="w-[100px] font-medium">
+                    <TableCell className="w-[130px] font-medium">
                       {date}
                     </TableCell>
                     <TableCell
@@ -59,7 +59,7 @@ export default function RecentTransactions({
                         type == "income"
                           ? " bg-green-100 dark:bg-[#0E2A2C] text-green-700 dark:text-[#0BBD72] ring-1 ring-green-600/10 dark:ring-[#0B4A33]"
                           : "bg-red-100 dark:bg-[#28202E] text-red-700 dark:text-[#E33A2E] ring-1 ring-red-600/10 dark:ring-[#532E3A]",
-                        "flex mt-3.5 w-fit text-xs items-center rounded-sm px-2 py-0.5 font- ring-inset capitalize"
+                        "flex mt-3.5 w-fit text-xs items-center rounded-sm px-2 py-0.5 ring-inset capitalize"
                       )}
                     >
                       {type}

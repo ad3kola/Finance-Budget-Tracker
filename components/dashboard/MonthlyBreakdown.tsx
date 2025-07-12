@@ -119,7 +119,7 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
                           style={{ backgroundColor: color }}
                           className={`w-3 h-3 rounded-full`}
                         />
-                        <h3 className="w-28 sm:win-full truncate">{category}</h3>
+                        <h3 className="w-28 sm:w-36 lg:w-full truncate ">{category}</h3>
                       </div>
                       <div className="col-span-1 w-full gap-3 flex items-center justify-between font-medium">
                         <p className="text-left w-full">${total.toFixed(2)}</p>
