@@ -107,23 +107,23 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
                 })()}
             </div>
             <div className="w-full flex flex-col h-full justify-between">
-              <div className="w-full flex-grow overflow-auto px-2">
+              <div className="w-full flex-grow overflow-y-auto px-2">
                 {data.breakdown.map(
                   ({ category, color, total, percentage }) => (
                     <div
                       key={category}
-                      className="grid grid-cols-3 w-full h-12 border-b tracking-wide capitalize"
+                      className="grid grid-cols-3 w-full h-12 border-b tracking-wide capitalize px-2"
                     >
                       <div className="col-span-2 flex items-center w-full justify-start gap-3 text-sm font-medium">
                         <div
                           style={{ backgroundColor: color }}
                           className={`w-3 h-3 rounded-full`}
                         />
-                        <h3 className="max-w-10 truncate">{category}</h3>
+                        <h3 className="w-28 sm:win-full truncate">{category}</h3>
                       </div>
                       <div className="col-span-1 w-full gap-3 flex items-center justify-between font-medium">
-                        <p className="text-left">${total.toFixed(2)}</p>
-                        <p>{percentage.toFixed(1)}%</p>
+                        <p className="text-left w-full">${total.toFixed(2)}</p>
+                        <p className='w-full'>{percentage.toFixed(1)}%</p>
                       </div>
                     </div>
                   )

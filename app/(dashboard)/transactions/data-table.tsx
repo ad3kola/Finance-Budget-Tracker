@@ -74,7 +74,7 @@ export function DataTable<TData, TValue>({
             className="max-w-sm text-sm font-medium"
           />
         </div>
-      </div> 
+      </div>
       <div className="w-full rounded-md border relative">
         <div className="absolute h-full w-5 bg-gradient-to-r via-background to-background top-0 right-0 z-50" />
         <Table>
@@ -130,7 +130,8 @@ export function DataTable<TData, TValue>({
       <div className="flex items-center justify-end space-x-2 py-4 ml-auto">
         <Button
           variant="outline"
-          size="sm" className="w-28"
+          size="sm"
+          className="w-28"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
@@ -138,7 +139,8 @@ export function DataTable<TData, TValue>({
         </Button>
         <Button
           variant="outline"
-          size="sm" className="w-28"
+          size="sm"
+          className="w-28"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >

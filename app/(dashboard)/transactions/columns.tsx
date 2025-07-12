@@ -15,9 +15,7 @@ import { TransactionsProps } from "@/lib/types";
 import { cn, IconMap } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 
-import {
-  MoreHorizontal,
-} from "lucide-react";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 export const columns = (): // onDelete: (id: number) => void
 ColumnDef<TransactionsProps>[] => [
@@ -47,7 +45,11 @@ ColumnDef<TransactionsProps>[] => [
   },
   {
     accessorKey: "date",
-    header: "Date",
+    header: () => (
+      <h3>
+        Date <ArrowUpDown />
+      </h3>
+    ),
     cell: ({ row }) => {
       return <div className="font-medium ">{row.getValue("date")}</div>;
     },
@@ -64,9 +66,7 @@ ColumnDef<TransactionsProps>[] => [
         <div className="flex items-center gap-3 capitalize font-medium">
           <Button>
             {(() => {
-              return LucideIcon ? (
-                <LucideIcon className="w-4 h-4" />
-              ) : null;
+              return LucideIcon ? <LucideIcon className="w-4 h-4" /> : null;
             })()}
           </Button>
           <span>{name}</span>
@@ -96,7 +96,7 @@ ColumnDef<TransactionsProps>[] => [
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => (
-      <div className="text-sm max-w-4xl truncate">
+      <div className="text-sm max-w-80 2xl:max-w-2xl truncate">
         {row.getValue("description")}
       </div>
     ),
@@ -132,13 +132,13 @@ ColumnDef<TransactionsProps>[] => [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Button variant="ghost" asChild>
-                <span className="w-full">Edit Transaction</span>
-              </Button>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText("payment.id")}
+            >
+              Copy payment ID
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>View customer</DropdownMenuItem>
             <DropdownMenuItem>View payment details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
