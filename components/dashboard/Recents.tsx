@@ -21,8 +21,8 @@ export default function RecentTransactions({
 }) {
   return (
     <Card className="w-full col-span-2">
-      <CardHeader className="flex items-center justify-between w-full">
-        <CardTitle className="text-xl font-medium">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between w-full">
+        <CardTitle className="text-lg sm:text-xl font-medium">
           Recent Transactions
         </CardTitle>
         <Button variant={'outline'} asChild size={'sm'} className="text-xs">

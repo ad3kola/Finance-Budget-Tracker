@@ -29,7 +29,7 @@ function Page() {
   }, [getClient]);
 
   return (
-    <div className="w-full h-full p-8 flex flex-col gap-3">
+    <div className="w-full h-full p-3 flex flex-col gap-3">
       <div className="flex flex-col w-full gap-4">
         {/* 1st Row */}
         <h3 className="w-full text-2xl">

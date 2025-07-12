@@ -172,7 +172,7 @@ function Stats() {
         <div className="flex items-center gap-2">
           <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <AlertDialogTrigger asChild>
-              <Button className="group cursor-pointer">
+              <Button variant ='outline' size='sm' className="group cursor-pointer">
                 <PlusCircleIcon className="h-6 w-6 transition-transform duration-300 group-hover:rotate-360 group-hover:scale-125" />
                 <span className="hidden md:inline-flex"> New Transaction</span>
               </Button>
@@ -197,7 +197,7 @@ function Stats() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Button className="cursor-pointer group">
+          <Button className="cursor-pointer group" variant ='outline' size='sm' >
             <ArrowPathIcon className="h-5 w-5 transition-transform duration-300 group-hover:rotate-360" />
             <span className="hidden md:inline-flex">Reset Date</span>
           </Button>

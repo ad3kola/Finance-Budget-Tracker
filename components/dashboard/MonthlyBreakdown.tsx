@@ -45,15 +45,15 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
 
   return (
     <Card>
-      <CardHeader className="flex sm:items-center items-start justify-between w-full">
-        <CardTitle className="text-xl">{`Monthly ${
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center items-start justify-between w-full gap-2">
+        <CardTitle className="text-lg sm:text-xl font-medium">{`Monthly ${
           type == "income" ? " Earnings" : "Expenses"
         } Breakdown`}</CardTitle>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button size='sm' className="group w-fit cursor-pointer">
-              <PlusIcon className="h-8 w-8 transition-transform duration-300 group-hover:rotate-360 group-hover:scale-125" />
-              <span className="inline-flex"> Add Category</span>
+            <Button variant='outline' size='sm' className="group w-fit cursor-pointer">
+              <PlusIcon className="h-6 w-6 transition-transform duration-300 group-hover:rotate-360 group-hover:scale-125" />
+              <span className="inline-flex text-xs"> Add Category</span>
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -119,7 +119,7 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
                           style={{ backgroundColor: color }}
                           className={`w-3 h-3 rounded-full`}
                         />
-                        <h3>{category}</h3>
+                        <h3 className="max-w-10 truncate">{category}</h3>
                       </div>
                       <div className="col-span-1 w-full gap-3 flex items-center justify-between font-medium">
                         <p className="text-left">${total.toFixed(2)}</p>
