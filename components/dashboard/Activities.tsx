@@ -65,7 +65,6 @@ export default function ChartAreaGradient() {
       <CardContent>
           <ChartContainer config={chartConfig} className="max-h-[400px] w-full">
             <AreaChart
-              className="border"
               accessibilityLayer
               data={chartData}
               margin={{ left: 12, right: 12 }}

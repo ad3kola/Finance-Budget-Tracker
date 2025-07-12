@@ -45,15 +45,15 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
 
   return (
     <Card>
-      <CardHeader className="flex flex-col md:flex-row items-center justify-between w-full">
+      <CardHeader className="flex sm:items-center items-start justify-between w-full">
         <CardTitle className="text-xl">{`Monthly ${
           type == "income" ? " Earnings" : "Expenses"
         } Breakdown`}</CardTitle>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button className="group w-fit cursor-pointer">
+            <Button size='sm' className="group w-fit cursor-pointer">
               <PlusIcon className="h-8 w-8 transition-transform duration-300 group-hover:rotate-360 group-hover:scale-125" />
-              <span className="hidden md:inline-flex"> Add Category</span>
+              <span className="inline-flex"> Add Category</span>
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -114,7 +114,7 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
                       key={category}
                       className="grid grid-cols-3 w-full h-12 border-b tracking-wide capitalize"
                     >
-                      <div className="col-span-2 flex items-center w-full border justify-start gap-3 text-sm font-medium">
+                      <div className="col-span-2 flex items-center w-full justify-start gap-3 text-sm font-medium">
                         <div
                           style={{ backgroundColor: color }}
                           className={`w-3 h-3 rounded-full`}
