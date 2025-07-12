@@ -21,7 +21,7 @@ export default function RecentTransactions({
 }) {
   return (
     <Card className="w-full col-span-2">
-      <CardHeader className="flex items-center justify-between w-full">
+      <CardHeader className="flex flex-col md:flex-row items-center justify-between w-full">
         <CardTitle className="text-xl font-medium">
           Recent Transactions
         </CardTitle>

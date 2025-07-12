@@ -1,6 +1,6 @@
 "use client";
 
-import {motion} from 'framer-motion'
+import { motion } from "framer-motion";
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -45,7 +45,7 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
 
   return (
     <Card>
-      <CardHeader className="flex items-center justify-between w-full">
+      <CardHeader className="flex flex-col md:flex-row items-center justify-between w-full">
         <CardTitle className="text-xl">{`Monthly ${
           type == "income" ? " Earnings" : "Expenses"
         } Breakdown`}</CardTitle>
@@ -53,6 +53,7 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
           <AlertDialogTrigger asChild>
             <Button className="group w-fit cursor-pointer">
               <PlusIcon className="h-8 w-8 transition-transform duration-300 group-hover:rotate-360 group-hover:scale-125" />
+              <span className="hidden md:inline-flex"> Add Category</span>
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -66,46 +67,54 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
       <CardContent className="pb-5 h-full px-4">
         {data ? (
           <>
-          <div className="relative flex h-2 w-full overflow-hidden rounded-full mb-4 bg-muted">
-  {data.total > 0 &&
-    (() => {
-      // Sort descending by percentage
-      const sorted = [...data.breakdown].sort((a, b) => b.percentage - a.percentage);
-      let cumulativePercent = 0;
-      return sorted.map(({ color, percentage }, i) => {
-        const style = {
-          backgroundColor: color,
-          left: `${cumulativePercent}%`,
-          width: `${percentage}%`,
-        };
-        cumulativePercent += percentage;
+            <div className="relative flex h-2 w-full overflow-hidden rounded-full mb-4 bg-muted">
+              {data.total > 0 &&
+                (() => {
+                  // Sort descending by percentage
+                  const sorted = [...data.breakdown].sort(
+                    (a, b) => b.percentage - a.percentage
+                  );
+                  let cumulativePercent = 0;
+                  return sorted.map(({ color, percentage }, i) => {
+                    const style = {
+                      backgroundColor: color,
+                      left: `${cumulativePercent}%`,
+                      width: `${percentage}%`,
+                    };
+                    cumulativePercent += percentage;
 
-        return (
-          <motion.div
-            key={i}
-            initial={{ width: 0, left: `${cumulativePercent - percentage}%` }}
-            animate={{ width: `${percentage}%`, left: `${cumulativePercent - percentage}%` }}
-            transition={{
-              duration: 0.9,
-              ease: "easeOut",
-              delay: i * 0.1,
-            }}
-            className="absolute h-full"
-            style={style}
-          />
-        );
-      });
-    })()}
-</div>
+                    return (
+                      <motion.div
+                        key={i}
+                        initial={{
+                          width: 0,
+                          left: `${cumulativePercent - percentage}%`,
+                        }}
+                        animate={{
+                          width: `${percentage}%`,
+                          left: `${cumulativePercent - percentage}%`,
+                        }}
+                        transition={{
+                          duration: 0.9,
+                          ease: "easeOut",
+                          delay: i * 0.1,
+                        }}
+                        className="absolute h-full"
+                        style={style}
+                      />
+                    );
+                  });
+                })()}
+            </div>
             <div className="w-full flex flex-col h-full justify-between">
-              <div className="w-full flex-grow overflow-y-auto px-2">
+              <div className="w-full flex-grow overflow-auto px-2">
                 {data.breakdown.map(
                   ({ category, color, total, percentage }) => (
                     <div
                       key={category}
                       className="grid grid-cols-3 w-full h-12 border-b tracking-wide capitalize"
                     >
-                      <div className="col-span-2 flex items-center w-full justify-start gap-3 text-sm font-medium">
+                      <div className="col-span-2 flex items-center w-full border justify-start gap-3 text-sm font-medium">
                         <div
                           style={{ backgroundColor: color }}
                           className={`w-3 h-3 rounded-full`}
