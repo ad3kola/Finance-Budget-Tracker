@@ -194,7 +194,7 @@ export default function CreateCategory({
   const {
     reset,
     formState: { errors },
-  } = useForm<z.infer<typeof CategorySchema>>();
+  } = form
 
   console.log(errors);
 
