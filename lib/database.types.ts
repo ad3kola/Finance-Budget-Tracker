@@ -20,6 +20,7 @@ export type Database = {
           Icon: string
           id: number
           name: string
+          type: string
           user_id: string
         }
         Insert: {
@@ -27,6 +28,7 @@ export type Database = {
           Icon: string
           id?: number
           name: string
+          type: string
           user_id: string
         }
         Update: {
@@ -34,6 +36,7 @@ export type Database = {
           Icon?: string
           id?: number
           name?: string
+          type?: string
           user_id?: string
         }
         Relationships: []
@@ -41,7 +44,7 @@ export type Database = {
       transactions: {
         Row: {
           amount: number
-          category: string
+          category: Json
           created_at: string
           date: string
           description: string
@@ -51,7 +54,7 @@ export type Database = {
         }
         Insert: {
           amount: number
-          category: string
+          category: Json
           created_at?: string
           date: string
           description: string
@@ -61,7 +64,7 @@ export type Database = {
         }
         Update: {
           amount?: number
-          category?: string
+          category?: Json
           created_at?: string
           date?: string
           description?: string

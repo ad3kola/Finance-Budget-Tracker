@@ -5,26 +5,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+import { cn, IconMap } from "@/lib/utils";
 import { useAuth, useUser } from "@clerk/nextjs";
-import {
-  ArrowLeftCircleIcon,
-  BanknoteIcon,
-  Building2Icon,
-  CalendarIcon,
-  CarIcon,
-  ClipboardCheckIcon,
-  DollarSignIcon,
-  GiftIcon,
-  HeartPlusIcon,
-  HomeIcon,
-  LaptopIcon,
-  PlusCircleIcon,
-  ShoppingCartIcon,
-  TvIcon,
-  UserCircleIcon,
-  UtensilsIcon,
-} from "lucide-react";
+
 import { format } from "date-fns";
 import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,48 +30,40 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CategoryMap } from "@/lib/types";
+import { CategoryItem } from "@/lib/types";
 import { Calendar } from "@/components/ui/calendar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createSupabaseClient } from "@/config/supabase-client";
 import { Button } from "./ui/button";
-
-const categories: CategoryMap = {
-  Income: [
-    { name: "Salary", Icon: BanknoteIcon },
-    { name: "Freelance", Icon: UserCircleIcon },
-    { name: "Business", Icon: Building2Icon },
-    { name: "Side Hustle", Icon: LaptopIcon },
-    { name: "Gifts", Icon: GiftIcon },
-    { name: "Refunds", Icon: ArrowLeftCircleIcon },
-    { name: "Other Income", Icon: PlusCircleIcon },
-  ],
-  Expense: [
-    { name: "Shopping", Icon: ShoppingCartIcon },
-    { name: "Food & Groceries", Icon: UtensilsIcon },
-    { name: "Home & Rentals", Icon: HomeIcon },
-    { name: "Transport", Icon: CarIcon },
-    { name: "Health", Icon: HeartPlusIcon },
-    { name: "Entertainment", Icon: TvIcon },
-  ],
-};
+import { Database } from "@/lib/database.types";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { fetchCategories } from "@/lib/data/dashboard/fetchCategories";
+import { CalendarIcon, ClipboardCheckIcon, DollarSignIcon } from "lucide-react";
 
 export default function CreateDialogBox({
   onSuccess,
+  supabase,
 }: {
+  supabase: SupabaseClient<Database> | null;
   onSuccess: () => void;
 }) {
-  const [expenseCategory, setExpenseCategory] = useState("");
-
   const { getToken } = useAuth();
 
   const { user, isSignedIn } = useUser();
+
+  const [activeCategory, setActiveCategory] = useState<CategoryItem | null>(
+    null
+  );
+
+  const [activeCategoryList, setActiveCategoryList] = useState<CategoryItem[]>(
+    []
+  );
 
   const form = useForm<z.infer<typeof transactionSchema>>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
       amount: 0.0,
-      category: "",
+      category: null,
       date: new Date(),
       description: "",
       type: "income",
@@ -104,8 +79,8 @@ export default function CreateDialogBox({
   async function onSubmit(values: z.infer<typeof transactionSchema>) {
     if (!user || !isSignedIn) return;
     const token = await getToken({ template: "supabase" });
-    const supabase = createSupabaseClient(token);
 
+    const supabase = createSupabaseClient(token);
     const date = form.getValues("date");
     const isoDate =
       date instanceof Date ? date.toISOString() : new Date(date).toISOString();
@@ -128,12 +103,23 @@ export default function CreateDialogBox({
       reset();
       onSuccess(); // close modal
     }
-    console.log(data)
+    console.log(data);
   }
 
-  const type = form.getValues("type");
+  console.log(activeCategory);
+  const type = form.watch("type");
 
-  const [incomeCategory, setIncomeCategory] = useState("");
+  useEffect(() => {
+    const fetch = async () => {
+      if (supabase) {
+        const res = await fetchCategories(supabase, type);
+        setActiveCategoryList(res);
+        setActiveCategory(null);
+        form.setValue("category", null);
+      }
+    };
+    fetch();
+  }, [supabase, type, form]);
 
   return (
     <Form {...form}>
@@ -144,7 +130,7 @@ export default function CreateDialogBox({
         <div className="flex flex-col gap-4">
           <Card>
             <CardHeader>
-              <CardTitle>Transaction DetaXils</CardTitle>
+              <CardTitle>Transaction Details</CardTitle>
             </CardHeader>
             <CardContent className="-mt-3">
               <div className="flex flex-col w-full gap-3">
@@ -207,16 +193,11 @@ export default function CreateDialogBox({
                         value={field.value}
                         onValueChange={(val) => {
                           field.onChange(val);
-                          form.setValue(
-                            "category",
-                            val === "income" ? incomeCategory : expenseCategory
-                          );
                         }}
                       >
                         <TabsList className="w-full">
                           <TabsTrigger
-                            className="w-
-full data-[state=active]:bg-green-500!"
+                            className="w-full data-[state=active]:bg-green-500!"
                             value="income"
                           >
                             Income
@@ -233,51 +214,51 @@ full data-[state=active]:bg-green-500!"
                             <FormField
                               control={form.control}
                               name="category"
-                              render={({ field }) => (
+                              render={() => (
                                 <FormItem>
                                   <Select
                                     onValueChange={(val) => {
-                                      field.onChange(val);
-                                      if (type === "income") {
-                                        setIncomeCategory(val);
-                                      } else {
-                                        setExpenseCategory(val);
-                                      }
+                                      const parsed = JSON.parse(val);
+                                      form.setValue("category", parsed);
+                                      setActiveCategory(parsed);
+                                      console.log(parsed);
                                     }}
-                                    defaultValue={
-                                      type === "income"
-                                        ? incomeCategory
-                                        : expenseCategory
-                                    }
                                   >
                                     <FormControl>
                                       <SelectTrigger className="w-full">
-                                        <SelectValue
-                                          placeholder={`Select an ${
-                                            val == "income"
-                                              ? "income"
-                                              : "expense"
-                                          } category`}
-                                        />
+                                        <SelectValue placeholder="Select a category" />
                                       </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                      {categories[
-                                        val == "income" ? "Income" : "Expense"
-                                      ].map(({ Icon, name }) => (
-                                        <SelectItem
-                                          key={name}
-                                          value={name.toLowerCase()}
-                                          className="w-full flex items-center px-4"
-                                        >
-                                          <Button size="sm">
-                                            <Icon className="w-4 h-4 text-background/80" />{" "}
-                                          </Button>{" "}
-                                          <p className="font-medium tracking-wider">
-                                            {name}
-                                          </p>
-                                        </SelectItem>
-                                      ))}
+                                      {activeCategoryList.map(
+                                        ({ Icon, name }) => {
+                                          return (
+                                            <SelectItem
+                                              key={name}
+                                              value={JSON.stringify({
+                                                name,
+                                                Icon,
+                                              })}
+                                              className="w-full flex items-center px-4"
+                                            >
+                                              <Button size="sm">
+                                                {(() => {
+                                                  const LucideIcon =
+                                                    IconMap[
+                                                      Icon as keyof typeof IconMap
+                                                    ];
+                                                  return LucideIcon ? (
+                                                    <LucideIcon className="w-4 h-4 text-background/80" />
+                                                  ) : null;
+                                                })()}
+                                              </Button>
+                                              <p className="font-medium tracking-wider capitalize">
+                                                {name}
+                                              </p>
+                                            </SelectItem>
+                                          );
+                                        }
+                                      )}
                                     </SelectContent>
                                   </Select>
                                   <FormMessage />

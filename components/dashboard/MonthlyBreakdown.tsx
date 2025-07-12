@@ -1,5 +1,7 @@
 "use client";
 
+import {motion} from 'framer-motion'
+
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { useSupabaseClient } from "@/lib/data/client";
@@ -12,10 +14,8 @@ import {
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import { PlusCircleIcon, PlusIcon } from "lucide-react";
-import fetchMonthlyIncome from "@/lib/data/dashboard/fetchMonthlyIncome";
-import fetchMonthlyExpenses from "@/lib/data/dashboard/fetchMonthlyExpenses";
-import CreateDialogBox from "../CreateDialogBox";
 import CreateCategory from "./CreateCategory";
+import { fetchBreakdown } from "@/lib/data/dashboard/fetchMonthlyBreakdowns";
 
 interface Income {
   total: number;
@@ -35,21 +35,17 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
   useEffect(() => {
     const fetch = async () => {
       const supabase = await getClient();
-      if (type == "income") {
-        const res = await fetchMonthlyIncome(supabase);
-        setData(res);
-      }
-      if (type == "expense") {
-        const res = await fetchMonthlyExpenses(supabase);
-        setData(res);
-      }
+      const res = await fetchBreakdown(supabase, type);
+      setData(res);
     };
     fetch();
   }, [getClient, type]);
 
+  console.log(data);
+
   return (
     <Card>
-      <CardHeader className='flex items-center justify-between w-full'>
+      <CardHeader className="flex items-center justify-between w-full">
         <CardTitle className="text-xl">{`Monthly ${
           type == "income" ? " Earnings" : "Expenses"
         } Breakdown`}</CardTitle>
@@ -60,7 +56,7 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
-            <CreateCategory type = {type == 'income' ? 'income' : 'expense'} />
+            <CreateCategory type={type == "income" ? "income" : "expense"} />
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
             </AlertDialogFooter>
@@ -70,15 +66,37 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
       <CardContent className="pb-5 h-full px-4">
         {data ? (
           <>
-            <div className="flex h-2 w-full overflow-hidden rounded-full mb-4">
-              {data.breakdown.map(({ color, percentage }, i) => (
-                <div
-                  key={i}
-                  style={{ width: `${percentage}%`, backgroundColor: color }}
-                  className="h-full"
-                />
-              ))}
-            </div>
+          <div className="relative flex h-2 w-full overflow-hidden rounded-full mb-4 bg-muted">
+  {data.total > 0 &&
+    (() => {
+      // Sort descending by percentage
+      const sorted = [...data.breakdown].sort((a, b) => b.percentage - a.percentage);
+      let cumulativePercent = 0;
+      return sorted.map(({ color, percentage }, i) => {
+        const style = {
+          backgroundColor: color,
+          left: `${cumulativePercent}%`,
+          width: `${percentage}%`,
+        };
+        cumulativePercent += percentage;
+
+        return (
+          <motion.div
+            key={i}
+            initial={{ width: 0, left: `${cumulativePercent - percentage}%` }}
+            animate={{ width: `${percentage}%`, left: `${cumulativePercent - percentage}%` }}
+            transition={{
+              duration: 0.9,
+              ease: "easeOut",
+              delay: i * 0.1,
+            }}
+            className="absolute h-full"
+            style={style}
+          />
+        );
+      });
+    })()}
+</div>
             <div className="w-full flex flex-col h-full justify-between">
               <div className="w-full flex-grow overflow-y-auto px-2">
                 {data.breakdown.map(
@@ -132,7 +150,14 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
-                <CreateDialogBox onSuccess={() => {}} />
+                <CreateCategory
+                  type={type}
+                  onSuccess={async () => {
+                    const supabase = await getClient();
+                    const updated = await fetchBreakdown(supabase, type);
+                    setData(updated);
+                  }}
+                />
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                 </AlertDialogFooter>

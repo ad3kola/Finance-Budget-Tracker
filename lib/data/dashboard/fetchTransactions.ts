@@ -15,6 +15,10 @@ export const fetchRecentTransactions = async (
   const filteredData = data?.slice(0, 5).map((val) => ({
     ...val,
     date: format(parseISO(val.date), "PPP"),
+    category:
+      typeof val.category === "string"
+        ? JSON.parse(val.category)
+        : val.category,
   }));
 
   console.log(filteredData);

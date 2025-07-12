@@ -12,8 +12,8 @@ import MonthlyBreakdown from "@/components/dashboard/MonthlyBreakdown";
 
 function Page() {
   const [recentTransactions, setRecentTransactions] = useState<
-    TransactionsProps[] | []
-  >([]);
+    TransactionsProps[] | null
+  >(null);
 
   const { user } = useUser();
   const { getClient } = useSupabaseClient();

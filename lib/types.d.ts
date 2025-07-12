@@ -21,7 +21,10 @@ export interface CategoryMap {
 
 export interface TransactionsProps {
   amount: number;
-  category: string;
+  category: {
+    name: string
+    Icon: string
+  } | null;
   created_at: string;
   date: string;
   description: string;

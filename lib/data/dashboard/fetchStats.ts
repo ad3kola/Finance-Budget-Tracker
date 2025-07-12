@@ -28,11 +28,20 @@ export const fetchStats = async (
     return [];
   }
 
-  const totalEarnings = (data ?? [])
+
+const parsedData = (data ?? []).map((tx) => ({
+    ...tx,
+    category:
+      typeof tx.category === "string"
+        ? JSON.parse(tx.category)
+        : tx.category,
+  }));
+
+  const totalEarnings = (parsedData ?? [])
     .filter((tx) => tx.type === "income")
     .reduce((sum, tx) => sum + Number(tx.amount), 0);
 
-  const totalExpenses = (data ?? [])
+  const totalExpenses = (parsedData ?? [])
     .filter((tx) => tx.type === "expense")
     .reduce((sum, tx) => sum + Number(tx.amount), 0);
 
@@ -40,13 +49,13 @@ export const fetchStats = async (
     month: `${month} ${year}`,
     totalEarnings,
     totalExpenses,
-    transactions: data ?? [],
+    transactions: parsedData ?? [],
   });
 
   return [
       {month: `${month} ${year}`,
       totalEarnings,
       totalExpenses,
-      transactions: data ?? [],}
+      transactions: parsedData ?? [],}
   ];
 };

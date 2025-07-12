@@ -96,10 +96,10 @@ export function DataTable<TData, TValue>({
         </div>
         <div className="flex items-center py-4">
           <Input
-            placeholder="Filter by month..."
-            value={(table.getColumn("month")?.getFilterValue() as string) ?? ""}
+            placeholder="Filter by type..."
+            value={(table.getColumn("type")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
-              table.getColumn("month")?.setFilterValue(event.target.value)
+              table.getColumn("type")?.setFilterValue(event.target.value)
             }
             className="max-w-sm text-sm font-medium"
           />
@@ -157,7 +157,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py\-4">
+      <div className="flex items-center justify-end space-x-2 py-4">
         <Button
           variant="outline"
           size="sm"

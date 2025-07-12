@@ -1,53 +1,6 @@
 "use client";
 
 import { useAuth, useUser } from "@clerk/nextjs";
-import {
-  AppleIcon,
-  BadgeDollarSignIcon,
-  BanknoteIcon,
-  BatteryChargingIcon,
-  BookOpenIcon,
-  BriefcaseIcon,
-  BrushIcon,
-  BuildingIcon,
-  CalendarCheckIcon,
-  CameraIcon,
-  CarIcon,
-  CoinsIcon,
-  CreditCardIcon,
-  DollarSignIcon,
-  DropletIcon,
-  DumbbellIcon,
-  FlameIcon,
-  GamepadIcon,
-  GiftIcon,
-  GraduationCapIcon,
-  HandCoinsIcon,
-  HandshakeIcon,
-  HeartIcon,
-  HeartPulseIcon,
-  HomeIcon,
-  LandmarkIcon,
-  LaptopIcon,
-  Layers3Icon,
-  MusicIcon,
-  PiggyBankIcon,
-  PlaneIcon,
-  ReceiptIcon,
-  ShieldCheckIcon,
-  ShirtIcon,
-  ShoppingCartIcon,
-  SmartphoneIcon,
-  StoreIcon,
-  TrendingUpIcon,
-  TvIcon,
-  UserCheckIcon,
-  UserIcon,
-  UtensilsIcon,
-  WalletIcon,
-  WifiIcon,
-  WrenchIcon,
-} from "lucide-react";
 import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -64,11 +17,14 @@ import { Button } from "../ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { CategorySchema } from "@/config/zod/categories.schema";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn, IconMap } from "@/lib/utils";
+import { Layers3Icon } from "lucide-react";
 
 export default function CreateCategory({
+  onSuccess,
   type,
 }: {
+  onSuccess? : () => void;
   type: "income" | "expense";
 }) {
   const { getToken } = useAuth();
@@ -137,52 +93,6 @@ export default function CreateCategory({
     { name: "E-commerce Sales", Icon: "StoreIcon" },
   ];
 
-  const IconMap = {
-    ShoppingCartIcon,
-    UtensilsIcon,
-    HomeIcon,
-    CarIcon,
-    PlaneIcon,
-    HeartPulseIcon,
-    GraduationCapIcon,
-    SmartphoneIcon,
-    TvIcon,
-    WifiIcon,
-    DropletIcon,
-    FlameIcon,
-    BatteryChargingIcon,
-    PiggyBankIcon,
-    BanknoteIcon,
-    CreditCardIcon,
-    BriefcaseIcon,
-    ShirtIcon,
-    BrushIcon,
-    GiftIcon,
-    AppleIcon,
-    DumbbellIcon,
-    ShieldCheckIcon,
-    WrenchIcon,
-    LandmarkIcon,
-    BadgeDollarSignIcon,
-    WalletIcon,
-    CoinsIcon,
-    TrendingUpIcon,
-    BuildingIcon,
-    HandCoinsIcon,
-    DollarSignIcon,
-    UserCheckIcon,
-    ReceiptIcon,
-    HandshakeIcon,
-    CalendarCheckIcon,
-    UserIcon,
-    BookOpenIcon,
-    LaptopIcon,
-    MusicIcon,
-    CameraIcon,
-    GamepadIcon,
-    HeartIcon,
-    StoreIcon,
-  } as const;
 
   const form = useForm<z.infer<typeof CategorySchema>>({
     resolver: zodResolver(CategorySchema),
@@ -206,6 +116,7 @@ export default function CreateCategory({
     const categoryData = {
         ...values,
         user_id: user.id,
+        type,
     }
     const { data, error } = await supabase
       .from("categories")
@@ -218,6 +129,7 @@ export default function CreateCategory({
       reset();
     }
     console.log(data);
+    onSuccess?.()
   }
 
   const category =

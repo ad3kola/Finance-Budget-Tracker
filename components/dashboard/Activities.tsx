@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { TrendingUp } from "lucide-react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { TrendingUp } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -9,23 +9,23 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-import { fetchBarCharts } from "@/lib/data/dashboard/fetchChartsData"
-import { useSupabaseClient } from "@/lib/data/client"
-import { useEffect, useState } from "react"
+} from "@/components/ui/chart";
+import { fetchBarCharts } from "@/lib/data/dashboard/fetchChartsData";
+import { useSupabaseClient } from "@/lib/data/client";
+import { useEffect, useState } from "react";
 
-export const description = "An area chart with gradient fill"
+export const description = "An area chart with gradient fill";
 
 interface ChartDataProps {
-  month: string
-  income: number
-  expenses: number
+  month: string;
+  income: number;
+  expenses: number;
 }
 
 const chartConfig = {
@@ -37,22 +37,22 @@ const chartConfig = {
     label: "Expenses",
     color: "var(--foreground)",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export default function ChartAreaGradient() {
-  const { getClient } = useSupabaseClient()
-  const [chartData, setChartData] = useState<ChartDataProps[]>([])
+  const { getClient } = useSupabaseClient();
+  const [chartData, setChartData] = useState<ChartDataProps[]>([]);
 
   useEffect(() => {
     const fetch = async () => {
-      const supabase = await getClient()
-      const data = await fetchBarCharts(supabase)
-      setChartData(data)
-    }
-    fetch()
-  }, [getClient])
+      const supabase = await getClient();
+      const data = await fetchBarCharts(supabase);
+      setChartData(data);
+    };
+    fetch();
+  }, [getClient]);
 
-  console.log(chartData)
+  console.log(chartData);
 
   return (
     <Card className="col-span-2">
@@ -63,63 +63,64 @@ export default function ChartAreaGradient() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <AreaChart
-            accessibilityLayer
-            data={chartData}
-            margin={{ left: 12, right: 12 }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <defs>
-              <linearGradient id="fillIncome" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-income)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-income)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-              <linearGradient id="fillExpenses" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-expenses)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-expenses)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-            </defs>
-            <Area
-              dataKey="expenses"
-              type="natural"
-              fill="url(#fillExpenses)"
-              stroke="var(--color-expenses)"
-              stackId="a"
-            />
-            <Area
-              dataKey="income"
-              type="natural"
-              fill="url(#fillIncome)"
-              stroke="var(--color-income)"
-              stackId="a"
-            />
-          </AreaChart>
-        </ChartContainer>
+          <ChartContainer config={chartConfig} className="max-h-[400px] w-full">
+            <AreaChart
+              className="border"
+              accessibilityLayer
+              data={chartData}
+              margin={{ left: 12, right: 12 }}
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => value.slice(0, 3)}
+              />
+              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+              <defs>
+                <linearGradient id="fillIncome" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="var(--color-income)"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--color-income)"
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+                <linearGradient id="fillExpenses" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="var(--color-expenses)"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--color-expenses)"
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+              </defs>
+              <Area
+                dataKey="expenses"
+                type="natural"
+                fill="url(#fillExpenses)"
+                stroke="var(--color-expenses)"
+                stackId="a"
+              />
+              <Area
+                dataKey="income"
+                type="natural"
+                fill="url(#fillIncome)"
+                stroke="var(--color-income)"
+                stackId="a"
+              />
+            </AreaChart>
+          </ChartContainer>
       </CardContent>
       <CardFooter>
         <div className="flex w-full items-start gap-2 text-sm">
@@ -134,5 +135,5 @@ export default function ChartAreaGradient() {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

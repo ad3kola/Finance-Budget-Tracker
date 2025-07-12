@@ -34,6 +34,8 @@ import {
 import { ArrowPathIcon } from "@heroicons/react/20/solid";
 import CreateDialogBox from "@/components/CreateDialogBox";
 import { PlusCircleIcon } from "lucide-react";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { Database } from "@/lib/database.types";
 
 interface Stats {
   month: string;
@@ -43,6 +45,8 @@ interface Stats {
 }
 
 function Stats() {
+
+  
   const { getClient } = useSupabaseClient();
   const [statsData, setStatsData] = useState<Stats | null>(null);
 
@@ -53,7 +57,10 @@ function Stats() {
 
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [currentIndex, setCurrentIndex] = useState(currentMonth);
+  const [supabaseClient, setSupabaseClient] =
+    useState<SupabaseClient<Database> | null>(null);
 
+    const monthName = format(new Date(selectedYear, currentIndex, 1), "MMMM");
   const handlePrev = () => {
     if (currentIndex === 0) {
       if (selectedYear > 2023) {
@@ -82,8 +89,10 @@ function Stats() {
   useEffect(() => {
     const fetch = async () => {
       const supabase = await getClient();
+      setSupabaseClient(supabase);
       const monthName = format(new Date(selectedYear, currentIndex, 1), "MMMM");
       const data = await fetchStats(supabase, monthName, selectedYear);
+
       setStatsData(data[0]);
     };
     fetch();
@@ -128,19 +137,35 @@ function Stats() {
     <div className="flex w-full flex-col gap-2">
       <div className="flex items-center w-full justify-between">
         <div className="flex items-center justify-end gap-2">
-          <Button variant="outline" size='sm' className="cursor-pointer" onClick={handlePrev}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="cursor-pointer"
+            onClick={handlePrev}
+          >
             <MoveLeftIcon className="w-4 h-4" />
           </Button>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" className="w-24 h-9 border-b border-foreground rounded-sm cursor-default">
+            <Button
+              variant="ghost"
+              className="w-24 h-9 border-b border-foreground rounded-sm cursor-default"
+            >
               {allMonths[currentIndex]}
             </Button>
 
-            <Button variant="ghost" className="w-16 h-9 border-b border-foreground rounded-sm cursor-default">
+            <Button
+              variant="ghost"
+              className="w-16 h-9 border-b border-foreground rounded-sm cursor-default"
+            >
               {selectedYear}
             </Button>
           </div>
-          <Button variant="outline" size='sm' className="cursor-pointer" onClick={handleNext}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="cursor-pointer"
+            onClick={handleNext}
+          >
             <MoveRightIcon className="w-4 h-4" />
           </Button>
         </div>
@@ -153,7 +178,18 @@ function Stats() {
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
-              <CreateDialogBox onSuccess={() => setIsDialogOpen(false)} />
+              {supabaseClient && <CreateDialogBox
+                supabase={supabaseClient}
+                onSuccess={async () => {
+                  setIsDialogOpen(false);
+                  const refreshed = await fetchStats(
+                    supabaseClient,
+                    monthName,
+                    selectedYear
+                  );
+                  setStatsData(refreshed[0]);
+                }}
+              />}
               <AlertDialogFooter>
                 <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>
                   Cancel

@@ -20,20 +20,19 @@ import {
 //   AlertDialogTrigger,
 // } from "@/components/ui/alert-dialog";
 import { TransactionsProps } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, IconMap } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 
-import { 
-  // ClipboardEditIcon, 
+import {
+  // ClipboardEditIcon,
   // TrashIcon ,
-  MoreHorizontal, 
-  } from "lucide-react";
+  MoreHorizontal,
+} from "lucide-react";
 // import UpdateDialogBox from "@/components/transactions/UpdateDialogBox";
 
 export const columns = (): // onDelete: (id: number) => void
 ColumnDef<TransactionsProps>[] => [
-  
   {
     id: "select",
     header: ({ table }) => (
@@ -63,15 +62,30 @@ ColumnDef<TransactionsProps>[] => [
     header: "Date",
     cell: ({ row }) => {
       const formattedDate = format(row.getValue("date"), "PPP");
-      return <div className="font-medium text-center">{formattedDate}</div>;
+      return <div className="font-medium ">{formattedDate}</div>;
     },
   },
   {
     accessorKey: "category",
     header: "Category",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("category")}</div>
-    ),
+    cell: ({ row }) => {
+      const category = row.original.category;
+      if (!category) return null;
+      const { Icon, name } = category;
+      const LucideIcon = IconMap[Icon as keyof typeof IconMap];
+      return (
+        <div className="flex items-center gap-3 capitalize font-medium">
+          <Button>
+            {(() => {
+              return LucideIcon ? (
+                <LucideIcon className="w-4 h-4" />
+              ) : null;
+            })()}
+          </Button>
+          <span>{name}</span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "type",
@@ -95,7 +109,7 @@ ColumnDef<TransactionsProps>[] => [
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => (
-      <div className="text-sm max-w-96 truncate ">
+      <div className="text-sm max-w-4xl truncate">
         {row.getValue("description")}
       </div>
     ),
@@ -134,7 +148,9 @@ ColumnDef<TransactionsProps>[] => [
 
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Button variant='ghost' asChild><span className='w-full'>Edit Transaction</span></Button>
+              <Button variant="ghost" asChild>
+                <span className="w-full">Edit Transaction</span>
+              </Button>
             </DropdownMenuItem>
             <DropdownMenuItem>View payment details</DropdownMenuItem>
           </DropdownMenuContent>
