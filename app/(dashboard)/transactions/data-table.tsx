@@ -12,12 +12,6 @@ import {
 } from "@tanstack/react-table";
 
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Table,
   TableBody,
   TableCell,
@@ -58,30 +52,6 @@ export function DataTable<TData, TValue>({
   return (
     <div className="w-full flex flex-col items-start">
       <div className="w-full flex items-center gap-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">Columns</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
         <div className="flex items-center py-4">
           <Input
             placeholder="Filter categories..."
@@ -157,10 +127,10 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex items-center justify-end space-x-2 py-4 ml-auto">
         <Button
           variant="outline"
-          size="sm"
+          size="sm" className="w-28"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
@@ -168,7 +138,7 @@ export function DataTable<TData, TValue>({
         </Button>
         <Button
           variant="outline"
-          size="sm"
+          size="sm" className="w-28"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >

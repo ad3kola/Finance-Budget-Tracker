@@ -11,25 +11,13 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 
-// import {
-//   AlertDialog,
-//   AlertDialogAction,
-//   AlertDialogCancel,
-//   AlertDialogContent,
-//   AlertDialogFooter,
-//   AlertDialogTrigger,
-// } from "@/components/ui/alert-dialog";
 import { TransactionsProps } from "@/lib/types";
 import { cn, IconMap } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
-import { format } from "date-fns";
 
 import {
-  // ClipboardEditIcon,
-  // TrashIcon ,
   MoreHorizontal,
 } from "lucide-react";
-// import UpdateDialogBox from "@/components/transactions/UpdateDialogBox";
 
 export const columns = (): // onDelete: (id: number) => void
 ColumnDef<TransactionsProps>[] => [
@@ -61,8 +49,7 @@ ColumnDef<TransactionsProps>[] => [
     accessorKey: "date",
     header: "Date",
     cell: ({ row }) => {
-      const formattedDate = format(row.getValue("date"), "PPP");
-      return <div className="font-medium ">{formattedDate}</div>;
+      return <div className="font-medium ">{row.getValue("date")}</div>;
     },
   },
   {

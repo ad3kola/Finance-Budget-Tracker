@@ -21,6 +21,27 @@ export const fetchRecentTransactions = async (
         : val.category,
   }));
 
-  console.log(filteredData);
   return filteredData || [];
 };
+
+export const fetchAllTransactions = async (
+  supabase: SupabaseClient<Database>
+) => {
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("*")
+    .order("date", { ascending: false });
+
+  if (error) console.error("Error retrieving data:", error.message);
+
+  return data?.map((val) => ({
+    ...val,
+    date: format(parseISO(val.date), "PPP"),
+    category:
+      typeof val.category === "string"
+        ? JSON.parse(val.category)
+        : val.category,
+  })) || [];
+
+};
+
