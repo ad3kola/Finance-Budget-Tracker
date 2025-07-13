@@ -1,10 +1,8 @@
 "use client";
 
 import {
-  Banknote,
   EllipsisIcon,
   PackagePlusIcon,
-  ShoppingCartIcon,
   WalletIcon,
 } from "lucide-react";
 import {
@@ -38,6 +36,7 @@ import CreateDialogBox from "@/components/CreateDialogBox";
 import { PlusCircleIcon } from "lucide-react";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "@/lib/database.types";
+import StatsGraph from "./StatsGraph";
 
 interface Stats {
   month: string;
@@ -46,7 +45,7 @@ interface Stats {
   transactions: TransactionsProps[];
 }
 
-function Stats({
+function StatsOverview({
   refresh,
   onRefresh,
 }: {
@@ -55,7 +54,7 @@ function Stats({
 }) {
   const { getClient } = useSupabaseClient();
   const [statsData, setStatsData] = useState<Stats | null>(null);
-
+console.log(statsData)
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -107,20 +106,20 @@ function Stats({
   );
 
   const data: StatsProps[] = [
-    {
-      title: "Earnings Overview",
-      value: statsData?.totalEarnings ?? 0,
-      Icon: Banknote,
-      roi: 0,
-      valueChange: 0,
-    },
-    {
-      title: "Total Expenses",
-      value: statsData?.totalExpenses ?? 0,
-      Icon: ShoppingCartIcon,
-      roi: 0,
-      valueChange: 0,
-    },
+    // {
+    //   title: "Earnings Overview",
+    //   value: statsData?.totalEarnings ?? 0,
+    //   Icon: Banknote,
+    //   roi: 0,
+    //   valueChange: 0,
+    // },
+    // {
+    //   title: "Total Expenses",
+    //   value: statsData?.totalExpenses ?? 0,
+    //   Icon: ShoppingCartIcon,
+    //   roi: 0,
+    //   valueChange: 0,
+    // },
     {
       title: "Current Savings",
       value: 0,
@@ -214,11 +213,24 @@ function Stats({
           </Button>
         </div>
       </div>
-      <div className="grid grid-auto-cols-fr grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+       <div className="w-full grid grid-cols-1 gap-3 md:grid-cols-3">
+        <StatsGraph
+          title="User Activity Overview"
+          type="income"
+          desc=" Desktop user visits over the past six months"
+        />
+        <StatsGraph
+          title="User Activity Overview"
+          type="expense"
+          desc=" Desktop user visits over the past six months"
+        />
+        <div className="w-full grid grid-auto-cols-fr grid-cols-2 sm:grid-cols-1 gap-3">
         {data.map((item) => (
           <StatCard key={item.title} {...item} />
         ))}
       </div>
+      </div>
+      
     </div>
   );
 }
@@ -263,4 +275,4 @@ function StatCard({ title, value, Icon, roi, valueChange }: StatsProps) {
   );
 }
 
-export default Stats;
+export default StatsOverview;
