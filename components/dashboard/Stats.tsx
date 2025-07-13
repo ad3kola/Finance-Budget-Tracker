@@ -6,8 +6,6 @@ import {
   PackagePlusIcon,
   ShoppingCartIcon,
   WalletIcon,
-  MoveRightIcon,
-  MoveLeftIcon,
 } from "lucide-react";
 import {
   Card,
@@ -31,7 +29,11 @@ import {
   AlertDialogFooter,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ArrowPathIcon } from "@heroicons/react/20/solid";
+import {
+  ArrowPathIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
+} from "@heroicons/react/20/solid";
 import CreateDialogBox from "@/components/CreateDialogBox";
 import { PlusCircleIcon } from "lucide-react";
 import { SupabaseClient } from "@supabase/supabase-js";
@@ -44,9 +46,13 @@ interface Stats {
   transactions: TransactionsProps[];
 }
 
-function Stats() {
-
-  
+function Stats({
+  refresh,
+  onRefresh,
+}: {
+  refresh?: number;
+  onRefresh?: () => void;
+}) {
   const { getClient } = useSupabaseClient();
   const [statsData, setStatsData] = useState<Stats | null>(null);
 
@@ -60,7 +66,7 @@ function Stats() {
   const [supabaseClient, setSupabaseClient] =
     useState<SupabaseClient<Database> | null>(null);
 
-    const monthName = format(new Date(selectedYear, currentIndex, 1), "MMMM");
+  const monthName = format(new Date(selectedYear, currentIndex, 1), "MMMM");
   const handlePrev = () => {
     if (currentIndex === 0) {
       if (selectedYear > 2023) {
@@ -92,12 +98,10 @@ function Stats() {
       setSupabaseClient(supabase);
       const monthName = format(new Date(selectedYear, currentIndex, 1), "MMMM");
       const data = await fetchStats(supabase, monthName, selectedYear);
-
       setStatsData(data[0]);
     };
     fetch();
-  }, [currentIndex, selectedYear, getClient]);
-
+  }, [currentIndex, selectedYear, getClient, refresh]);
   const allMonths = Array.from({ length: 12 }, (_, i) =>
     format(setMonth(setYear(new Date(), selectedYear), i), "MMMM")
   );
@@ -143,7 +147,7 @@ function Stats() {
             className="cursor-pointer"
             onClick={handlePrev}
           >
-            <MoveLeftIcon className="w-4 h-4" />
+            <ChevronDoubleLeftIcon className="w-4 h-4" />
           </Button>
           <div className="flex items-center gap-1">
             <Button
@@ -166,30 +170,37 @@ function Stats() {
             className="cursor-pointer"
             onClick={handleNext}
           >
-            <MoveRightIcon className="w-4 h-4" />
+            <ChevronDoubleRightIcon className="w-4 h-4" />
           </Button>
         </div>
         <div className="flex items-center gap-2">
           <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <AlertDialogTrigger asChild>
-              <Button variant ='outline' size='sm' className="group cursor-pointer">
+              <Button
+                variant="outline"
+                size="sm"
+                className="group cursor-pointer"
+              >
                 <PlusCircleIcon className="h-6 w-6 transition-transform duration-300 group-hover:rotate-360 group-hover:scale-125" />
                 <span className="hidden md:inline-flex"> New Transaction</span>
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
-              {supabaseClient && <CreateDialogBox
-                supabase={supabaseClient}
-                onSuccess={async () => {
-                  setIsDialogOpen(false);
-                  const refreshed = await fetchStats(
-                    supabaseClient,
-                    monthName,
-                    selectedYear
-                  );
-                  setStatsData(refreshed[0]);
-                }}
-              />}
+              {supabaseClient && (
+                <CreateDialogBox
+                  supabase={supabaseClient}
+                  onSuccess={async () => {
+                    setIsDialogOpen(false);
+                    const refreshed = await fetchStats(
+                      supabaseClient,
+                      monthName,
+                      selectedYear
+                    );
+                    setStatsData(refreshed[0]);
+                    onRefresh?.(); // trigger external refresh (e.g., RecentTransactions, ChartAreaGradient)
+                  }}
+                />
+              )}
               <AlertDialogFooter>
                 <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>
                   Cancel
@@ -197,7 +208,7 @@ function Stats() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Button className="cursor-pointer group" variant ='outline' size='sm' >
+          <Button className="cursor-pointer group" variant="outline" size="sm">
             <ArrowPathIcon className="h-5 w-5 transition-transform duration-300 group-hover:rotate-360" />
             <span className="hidden md:inline-flex">Reset Date</span>
           </Button>

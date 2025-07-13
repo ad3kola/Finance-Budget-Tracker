@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/chart";
 import { fetchBarCharts } from "@/lib/data/dashboard/fetchChartsData";
 import { useSupabaseClient } from "@/lib/data/client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export const description = "An area chart with gradient fill";
 
@@ -41,20 +41,19 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export default function ChartAreaGradient() {
+export default function ChartAreaGradient({ refresh }: { refresh?: number }) {
   const { getClient } = useSupabaseClient();
   const [chartData, setChartData] = useState<ChartDataProps[]>([]);
 
-  useEffect(() => {
-    const fetch = async () => {
-      const supabase = await getClient();
-      const data = await fetchBarCharts(supabase);
-      setChartData(data);
-    };
-    fetch();
+  const loadChartData = useCallback(async () => {
+    const supabase = await getClient();
+    const data = await fetchBarCharts(supabase);
+    setChartData(data);
   }, [getClient]);
 
-  console.log(chartData);
+  useEffect(() => {
+    loadChartData();
+  }, [loadChartData, refresh]);
 
   return (
     <Card className="col-span-2">

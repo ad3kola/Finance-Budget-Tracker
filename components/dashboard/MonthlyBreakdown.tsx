@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { motion } from "framer-motion";
 
 import { useEffect, useState } from "react";
@@ -28,20 +29,28 @@ interface Income {
   }[];
 }
 
-function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
+function MonthlyBreakdown({
+  type,
+  refresh,
+}: {
+  type: "income" | "expense";
+  refresh?: number;
+}) {
   const { getClient } = useSupabaseClient();
-
   const [data, setData] = useState<Income | null>(null);
-  useEffect(() => {
-    const fetch = async () => {
-      const supabase = await getClient();
-      const res = await fetchBreakdown(supabase, type);
-      setData(res);
-    };
-    fetch();
+  const [open, setOpen] = useState(false);
+
+  console.log(open);
+
+  const loadBreakdown = useCallback(async () => {
+    const supabase = await getClient();
+    const res = await fetchBreakdown(supabase, type);
+    setData(res);
   }, [getClient, type]);
 
-  console.log(data);
+  useEffect(() => {
+    loadBreakdown();
+  }, [loadBreakdown, refresh]);
 
   return (
     <Card>
@@ -51,13 +60,23 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
         } Breakdown`}</CardTitle>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant='outline' size='sm' className="group w-fit cursor-pointer">
+            <Button
+              variant="outline"
+              size="sm"
+              className="group w-fit cursor-pointer"
+            >
               <PlusIcon className="h-6 w-6 transition-transform duration-300 group-hover:rotate-360 group-hover:scale-125" />
               <span className="inline-flex text-xs"> Add Category</span>
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
-            <CreateCategory type={type == "income" ? "income" : "expense"} />
+            <CreateCategory
+              type={type}
+              onSuccess={async () => {
+                await loadBreakdown();
+                setOpen(false); // ✅ close modal after submit
+              }}
+            />
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
             </AlertDialogFooter>
@@ -119,11 +138,13 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
                           style={{ backgroundColor: color }}
                           className={`w-3 h-3 rounded-full`}
                         />
-                        <h3 className="w-28 sm:w-36 lg:w-full truncate ">{category}</h3>
+                        <h3 className="w-28 lg:w-44 2xl:w-full truncate ">
+                          {category}
+                        </h3>
                       </div>
                       <div className="col-span-1 w-full gap-3 flex items-center justify-between font-medium">
                         <p className="text-left w-full">${total.toFixed(2)}</p>
-                        <p className='w-full'>{percentage.toFixed(1)}%</p>
+                        <p className="w-full">{percentage.toFixed(1)}%</p>
                       </div>
                     </div>
                   )
@@ -159,14 +180,7 @@ function MonthlyBreakdown({ type }: { type: "income" | "expense" }) {
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
-                <CreateCategory
-                  type={type}
-                  onSuccess={async () => {
-                    const supabase = await getClient();
-                    const updated = await fetchBreakdown(supabase, type);
-                    setData(updated);
-                  }}
-                />
+                <CreateCategory type={type} onSuccess={loadBreakdown} />
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                 </AlertDialogFooter>

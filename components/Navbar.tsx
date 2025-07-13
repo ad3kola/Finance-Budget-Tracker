@@ -39,7 +39,7 @@ function MobileNavbar() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
-    <div className="block border-seperate border-b shadow-amber-200 shadow-xs bg-background md:hidden">
+    <div className="fixed top-0 left-0 w-full block border-seperate border-b shadow-amber-200 shadow-xs bg-background md:hidden z-50 ">
       <nav className="container flex items-center justify-between px-8 py-2">
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
