@@ -76,7 +76,7 @@ function MobileNavbar() {
 function DesktopNavbar() {
 
   return (
-    <div className="hidden border-separate border-b bg-background md:block w-full shadow-amber-200 shadow-xs">
+    <div className="hidden fixed top-0 left-0  border-separate border-b bg-background md:block w-full shadow-amber-200 shadow-xs">
       <nav className="w-full flex items-center justify-between px-8 py-2">
         <Logo />
         <div className="flex items-center gap-x-3 flex-1 justify-end">
