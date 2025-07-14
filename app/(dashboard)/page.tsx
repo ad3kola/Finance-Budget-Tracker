@@ -185,7 +185,7 @@ function Page() {
         />
       </div>
 
-      <div className="w-full grid grid-auto-cols-fr grid-cols-1 lg:grid-cols-3 gap-3">
+      <div className="w-full flex flex-col-reverse gap-3 lg:grid lg:grid-cols-3">
         <RecentTransactions data={recentTransactions} />
         <MonthlyBreakdown
           month={monthName}
