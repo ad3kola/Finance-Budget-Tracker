@@ -11,38 +11,45 @@ import { useSupabaseClient } from "@/lib/data/client";
 import MonthlyBreakdown from "@/components/dashboard/MonthlyBreakdown";
 import ChartAreaGradient from "@/components/dashboard/ChartAreaGradient";
 import { Button } from "@/components/ui/button";
-// import {
-//   AlertDialog,
-//   AlertDialogCancel,
-//   AlertDialogContent,
-//   AlertDialogFooter,
-//   AlertDialogTrigger,
-// } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
-  // PlusCircleIcon,
+  PlusCircleIcon,
 } from "lucide-react";
-// import CreateDialogBox from "@/components/CreateDialogBox";
+import CreateDialogBox from "@/components/CreateDialogBox";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { Database } from "@/lib/database.types";
+import { ArrowPathIcon } from "@heroicons/react/20/solid";
 
 function Page() {
   const [recentTransactions, setRecentTransactions] = useState<
     TransactionsProps[] | null
   >(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [supabaseClient, setSupabaseClient] =
+    useState<SupabaseClient<Database> | null>(null);
+
   const { user } = useUser();
   const { getClient } = useSupabaseClient();
-
-  // const triggerRefresh = () => setRefreshKey((prev) => prev + 1);
 
   useEffect(() => {
     const fetch = async () => {
       const supabase = await getClient();
+      setSupabaseClient(supabase);
       const res = await fetchRecentTransactions(supabase);
       setRecentTransactions(res);
     };
     fetch();
   }, [getClient, refreshKey]);
+
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
@@ -50,11 +57,12 @@ function Page() {
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [currentIndex, setCurrentIndex] = useState(currentMonth);
   const monthName = format(new Date(selectedYear, currentIndex, 1), "MMMM");
+
   const handlePrev = () => {
     if (currentIndex === 0) {
       if (selectedYear > 2023) {
         setSelectedYear((prev) => prev - 1);
-        setCurrentIndex(11); // December
+        setCurrentIndex(11);
       }
     } else {
       setCurrentIndex((prev) => prev - 1);
@@ -68,7 +76,7 @@ function Page() {
     if (currentIndex === maxMonth) {
       if (!isCurrentYear) {
         setSelectedYear((prev) => prev + 1);
-        setCurrentIndex(0); // January
+        setCurrentIndex(0);
       }
     } else {
       setCurrentIndex((prev) => prev + 1);
@@ -80,16 +88,52 @@ function Page() {
   );
 
   return (
-    <div className="w-full h-full p-3 flex flex-col gap-3">
+    <div className="w-full h-full p-3 flex flex-col gap-3 pt-16">
       <div className="flex flex-col w-full gap-4">
-        {/* 1st Row */}
         <h3 className="w-full text-2xl">
           Welcome,
           <span className="ml-2 font-bold uppercase">
             {user?.firstName ?? "Adekola"}!👋
           </span>
         </h3>
-        <div className="flex items-center w-full justify-between">
+
+        {/* Sticky Date Picker Below Navbar */}
+        <div className="flex items-center w-full justify-between fixed border-b top-14 z-40 bg-background py-2">
+          <div className="flex items-center gap-2">
+            <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" className="group cursor-pointer">
+                  <PlusCircleIcon className="h-6 w-6 transition-transform duration-300 group-hover:rotate-360 group-hover:scale-125" />
+                  <span className="hidden md:inline-flex">New Transaction</span>
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                {supabaseClient && (
+                  <CreateDialogBox
+                    supabase={supabaseClient}
+                    onSuccess={() => {
+                      setIsDialogOpen(false);
+                      setRefreshKey((prev) => prev + 1);
+                    }}
+                  />
+                )}
+                <AlertDialogFooter>
+                  <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>
+                    Cancel
+                  </AlertDialogCancel>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <Button
+              className="cursor-pointer group"
+              variant="outline"
+              size="sm"
+              onClick={() => setRefreshKey((p) => p + 1)}
+            >
+              <ArrowPathIcon className="h-5 w-5 transition-transform duration-300 group-hover:rotate-360" />
+              <span className="hidden md:inline-flex">Reset Date</span>
+            </Button>
+          </div>
           <div className="flex items-center justify-end gap-1">
             <Button
               variant="outline"
@@ -105,7 +149,6 @@ function Page() {
               >
                 {allMonths[currentIndex]}
               </Button>
-
               <Button
                 variant="outline"
                 className="w-24 border-none h-9 rounded-sm cursor-default"
@@ -121,65 +164,17 @@ function Page() {
               <ChevronRightIcon className="w-4 h-4" />
             </Button>
           </div>
-          {/* <div className="flex items-center gap-2">
-            <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="group cursor-pointer"
-                >
-                  <PlusCircleIcon className="h-6 w-6 transition-transform duration-300 group-hover:rotate-360 group-hover:scale-125" />
-                  <span className="hidden md:inline-flex">
-                    {" "}
-                    New Transaction
-                  </span>
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                {supabaseClient && (
-                  <CreateDialogBox
-                    supabase={supabaseClient}
-                    onSuccess={async () => {
-                      setIsDialogOpen(false);
-                      const refreshed = await fetchStats(
-                        supabaseClient,
-                        monthName,
-                        selectedYear
-                      );
-                      setStatsData(refreshed[0]);
-                      onRefresh?.(); // trigger external refresh (e.g., RecentTransactions, ChartAreaGradient)
-                    }}
-                  />
-                )}
-                <AlertDialogFooter>
-                  <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>
-                    Cancel
-                  </AlertDialogCancel>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-            <Button
-              className="cursor-pointer group"
-              variant="outline"
-              size="sm"
-            >
-              <ArrowPathIcon className="h-5 w-5 transition-transform duration-300 group-hover:rotate-360" />
-              <span className="hidden md:inline-flex">Reset Date</span>
-            </Button>
-          </div> */}
         </div>
-        <div>
-          <StatsOverview
-            month={monthName}
-            year={selectedYear}
-            refresh={refreshKey}
-            onRefresh={() => setRefreshKey((p) => p + 1)}
-          />
-        </div>
+
+        {/* Main content */}
+        <StatsOverview
+          month={monthName}
+          year={selectedYear}
+          refresh={refreshKey}
+          onRefresh={() => setRefreshKey((p) => p + 1)}
+        />
       </div>
 
-      {/* 2nd Row */}
       <div className="w-full grid grid-auto-cols-fr grid-cols-1 lg:grid-cols-3 gap-3">
         <ChartAreaGradient refresh={refreshKey} />
         <MonthlyBreakdown
@@ -189,7 +184,7 @@ function Page() {
           refresh={refreshKey}
         />
       </div>
-      {/* 3rd Row */}
+
       <div className="w-full grid grid-auto-cols-fr grid-cols-1 lg:grid-cols-3 gap-3">
         <RecentTransactions data={recentTransactions} />
         <MonthlyBreakdown

@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  PackagePlusIcon,
-  WalletIcon,
-} from "lucide-react";
+import { PackagePlusIcon, WalletIcon } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -17,28 +14,13 @@ import { Separator } from "../ui/separator";
 import { useEffect, useState } from "react";
 import { fetchStats } from "@/lib/data/dashboard/fetchStats";
 import { useSupabaseClient } from "@/lib/data/client";
-
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { ArrowPathIcon } from "@heroicons/react/20/solid";
-import CreateDialogBox from "@/components/CreateDialogBox";
-import { PlusCircleIcon } from "lucide-react";
-import { SupabaseClient } from "@supabase/supabase-js";
-import { Database } from "@/lib/database.types";
 import StatsGraph from "./StatsGraph";
-
 
 const getTotal = (arr: { total: number }[]) =>
   arr.reduce((sum, item) => sum + item.total, 0);
 
 function StatsOverview({
   refresh,
-  onRefresh,
   month,
   year,
 }: {
@@ -49,22 +31,10 @@ function StatsOverview({
 }) {
   const { getClient } = useSupabaseClient();
   const [statsData, setStatsData] = useState<Stats | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [supabaseClient, setSupabaseClient] =
-    useState<SupabaseClient<Database> | null>(null);
-
-  useEffect(() => {
-    const init = async () => {
-      const client = await getClient();
-      setSupabaseClient(client);
-    };
-    init();
-  }, [getClient]);
 
   useEffect(() => {
     const fetch = async () => {
       const supabase = await getClient();
-      setSupabaseClient(supabase);
 
       const [incomeStats, expenseStats] = await Promise.all([
         fetchStats(supabase, "income", month, year),
@@ -101,52 +71,6 @@ function StatsOverview({
 
   return (
     <div className="flex w-full flex-col gap-2">
-      <div className="flex items-center w-full justify-between">
-        <div className="flex items-center gap-2">
-          <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="group cursor-pointer"
-              >
-                <PlusCircleIcon className="h-6 w-6 transition-transform duration-300 group-hover:rotate-360 group-hover:scale-125" />
-                <span className="hidden md:inline-flex"> New Transaction</span>
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              {supabaseClient && (
-                <CreateDialogBox
-                  supabase={supabaseClient}
-                  onSuccess={async () => {
-                    setIsDialogOpen(false);
-                    const [incomeStats, expenseStats] = await Promise.all([
-                      fetchStats(supabaseClient, "income", month, year),
-                      fetchStats(supabaseClient, "expense", month, year),
-                    ]);
-                    setStatsData({
-                      month,
-                      totalEarnings: getTotal(incomeStats.data),
-                      totalExpenses: getTotal(expenseStats.data),
-                      transactions: [],
-                    });
-                    onRefresh?.();
-                  }}
-                />
-              )}
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>
-                  Cancel
-                </AlertDialogCancel>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-          <Button className="cursor-pointer group" variant="outline" size="sm">
-            <ArrowPathIcon className="h-5 w-5 transition-transform duration-300 group-hover:rotate-360" />
-            <span className="hidden md:inline-flex">Reset Date</span>
-          </Button>
-        </div>
-      </div>
       <div className="w-full grid grid-cols-1 gap-3 md:grid-cols-3">
         <div className="md:col-span-2 grid sm:grid-cols-2 gap-3">
           <StatsGraph
@@ -155,7 +79,7 @@ function StatsOverview({
             value={statsData}
             year={year}
             title="Earnings Breakdown"
-            desc="Income distribution for the current month."
+            desc="Monthly income allocation overview."
           />
           <StatsGraph
             month={month}
@@ -163,7 +87,7 @@ function StatsOverview({
             value={statsData}
             title="Spending Breakdown"
             type="expense"
-            desc="Expenses categorized for the current month."
+            desc="How your expenses are split this month."
           />
         </div>
         <div className="w-full grid grid-auto-cols-fr grid-cols-2 md:grid-cols-1 gap-3">

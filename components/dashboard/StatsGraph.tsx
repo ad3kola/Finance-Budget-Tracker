@@ -86,7 +86,7 @@ export default function StatsGraph({
               type == "income"
                 ? "dark:bg-[#0E2A2C] text-green-700 dark:text-[#0BBD72]"
                 : "bg-red-100 dark:bg-[#28202E] text-red-700 dark:text-[#E33A2E]",
-              "text-xl font-semibold py-1.5 rounded-md px-4 w-fit h-fit"
+              "md:text-xl font-semibold py-1 rounded-md px-3 w-fit h-fit"
             )}
           >
             ${selectedValue}
