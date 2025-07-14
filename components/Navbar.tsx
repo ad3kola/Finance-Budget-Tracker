@@ -38,7 +38,7 @@ function MobileNavbar() {
 
   return (
     <div className="fixed top-0 left-0 right-0 w-full h-14 border-b bg-background shadow-md z-50 md:hidden">
-      <nav className="container flex items-center justify-between px-8 py-2">
+      <nav className="container flex items-center justify-between p-2">
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost">
@@ -72,7 +72,7 @@ function MobileNavbar() {
 
 function DesktopNavbar() {
   return (
-    <div className="hidden fixed top-0 left-0 right-0 h-14 border-b bg-background shadow-md z-50 md:flex items-center px-8">
+    <div className="hidden fixed top-0 left-0 right-0 h-14 border-b bg-background shadow-md z-50 md:flex items-center px-4">
       <Logo />
       <div className="flex items-center gap-x-3 flex-1 justify-end">
         <div className="flex items-center">
