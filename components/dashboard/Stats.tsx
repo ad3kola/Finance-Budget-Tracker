@@ -3,8 +3,6 @@
 import {
   PackagePlusIcon,
   WalletIcon,
-  BanknoteIcon,
-  ShoppingCartIcon,
 } from "lucide-react";
 import {
   Card,
@@ -14,7 +12,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Button } from "../ui/button";
-import { StatsProps, TransactionsProps } from "@/lib/types";
+import { Stats, StatsProps } from "@/lib/types";
 import { Separator } from "../ui/separator";
 import { useEffect, useState } from "react";
 import { fetchStats } from "@/lib/data/dashboard/fetchStats";
@@ -34,12 +32,6 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "@/lib/database.types";
 import StatsGraph from "./StatsGraph";
 
-interface Stats {
-  month: string;
-  totalEarnings: number;
-  totalExpenses: number;
-  transactions: TransactionsProps[];
-}
 
 const getTotal = (arr: { total: number }[]) =>
   arr.reduce((sum, item) => sum + item.total, 0);
@@ -92,20 +84,6 @@ function StatsOverview({
 
   const data: StatsProps[] = [
     {
-      title: "Earnings Overview",
-      value: statsData?.totalEarnings ?? 0,
-      Icon: BanknoteIcon,
-      roi: 0,
-      valueChange: 0,
-    },
-    {
-      title: "Total Expenses",
-      value: statsData?.totalExpenses ?? 0,
-      Icon: ShoppingCartIcon,
-      roi: 0,
-      valueChange: 0,
-    },
-    {
       title: "Current Savings",
       value: 0,
       Icon: WalletIcon,
@@ -113,7 +91,7 @@ function StatsOverview({
       valueChange: 0,
     },
     {
-      title: "Investment Portfolio",
+      title: "My Investments",
       value: 0,
       Icon: PackagePlusIcon,
       roi: 0,
@@ -173,14 +151,16 @@ function StatsOverview({
         <div className="md:col-span-2 grid sm:grid-cols-2 gap-3">
           <StatsGraph
             month={month}
+            type="income"
+            value={statsData}
             year={year}
             title="Earnings Breakdown"
-            type="income"
             desc="Income distribution for the current month."
           />
           <StatsGraph
             month={month}
             year={year}
+            value={statsData}
             title="Spending Breakdown"
             type="expense"
             desc="Expenses categorized for the current month."

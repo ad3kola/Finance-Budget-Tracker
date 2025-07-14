@@ -32,3 +32,11 @@ export interface TransactionsProps {
   type: string;
   user_id: string;
 }
+
+
+interface Stats {
+  month: string;
+  totalEarnings: number;
+  totalExpenses: number;
+  transactions: TransactionsProps[];
+}
