@@ -88,17 +88,10 @@ function Page() {
   );
 
   return (
-    <div className="w-full h-full p-3 flex flex-col gap-3 pt-16">
+    <div className="w-full h-full p-3 flex flex-col gap-3 pt-28 sm:pt-16">
       <div className="flex flex-col w-full gap-4">
-        <h3 className="w-full text-2xl">
-          Welcome,
-          <span className="ml-2 font-bold uppercase">
-            {user?.firstName ?? "Adekola"}!👋
-          </span>
-        </h3>
-
         {/* Sticky Date Picker Below Navbar */}
-        <div className="flex flex-col-reverse gap-2 sm:flex-row items-center w-full justify-between fixed border-b top-14 z-40 bg-background py-2">
+        <div className="flex flex-col-reverse gap-2 sm:flex-row items-center w-full justify-between fixed border-b top-14 z-40 backdrop-blur-md bg-white/10 dark:bg-zinc-900/10 py-2">
           <div className="flex items-center gap-2">
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <AlertDialogTrigger asChild>
@@ -173,6 +166,12 @@ function Page() {
             </Button>
           </div>
         </div>
+        <h3 className="w-full text-2xl">
+          Welcome,
+          <span className="ml-2 font-bold uppercase">
+            {user?.firstName ?? "Adekola"}!👋
+          </span>
+        </h3>
 
         {/* Main content */}
         <StatsOverview
