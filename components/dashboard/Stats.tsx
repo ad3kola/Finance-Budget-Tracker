@@ -112,13 +112,13 @@ function StatCard({ title, value, Icon, roi, valueChange }: StatsProps) {
         </div>
       </CardHeader>
       <CardContent className="-mt-5">
-        <h3 className="font-bold text-3xl">
+        <h3 className="font-bold text-3xl text-center sm:text-left">
           ${value.toFixed(2).toLocaleString()}
         </h3>
       </CardContent>
       <CardFooter className="flex flex-col -mt-3 w-full gap-2">
         <Separator />
-        <div className="flex items-center w-full gap-2">
+        <div className="flex items-center justify-center sm:justify-start w-full gap-2">
           <span className="inline-flex text-xs items-center rounded-sm bg-amber-50 px-2 py-0.5 font-medium text-amber-700 ring-1 ring-amber-600/10 ring-inset">
             +${valueChange}
           </span>
