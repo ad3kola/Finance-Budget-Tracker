@@ -80,7 +80,7 @@ function Page() {
         <h1 className="text-center text-2xl">
           Welcome,{" "}
           <span className="ml-2 font-bold">
-            {user.firstName}!👋
+            {user.username}!👋
           </span>
         </h1>
         <h2 className="mt-4 text-center text-base text-muted-foreground">

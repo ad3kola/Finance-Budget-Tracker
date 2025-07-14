@@ -169,7 +169,7 @@ function Page() {
         <h3 className="w-full text-2xl">
           Welcome,
           <span className="ml-2 font-bold uppercase">
-            {user?.firstName}!👋
+            {user?.username}!👋
           </span>
         </h3>
 
