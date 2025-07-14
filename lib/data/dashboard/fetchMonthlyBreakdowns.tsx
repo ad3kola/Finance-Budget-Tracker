@@ -20,7 +20,8 @@ export async function fetchMonthlyBreakdown(
   supabase: SupabaseClient<Database>,
   type: "income" | "expense",
   month: string,
-  year: number
+  year: number,
+  onTokenExpired?: () => Promise<void>  // optional token refresh callback
 ) {
   const monthIndex = monthNameToIndex(month);
   if (monthIndex === -1) throw new Error("Invalid month name");
@@ -29,18 +30,24 @@ export async function fetchMonthlyBreakdown(
   const end = new Date(year, monthIndex + 1, 0);
   end.setHours(23, 59, 59, 999);
 
-  // 1. Get all categories of this type (no date filter)
+  // Fetch categories
   const { data: categories, error: catErr } = await supabase
     .from("categories")
     .select("*")
     .eq("type", type);
 
-  if (catErr || !categories) {
-    console.error("Category fetch error:", catErr?.message);
+  if (catErr) {
+    console.error("Category fetch error:", catErr.message);
+    if (catErr.message.toLowerCase().includes("jwt expired") && onTokenExpired) {
+      await onTokenExpired();
+      // Retry after refresh
+      return fetchMonthlyBreakdown(supabase, type, month, year, onTokenExpired);
+    }
     return { total: 0, percentage: 0, breakdown: [] };
   }
+  if (!categories) return { total: 0, percentage: 0, breakdown: [] };
 
-  // 2. Get transactions of the given month/year and type
+  // Fetch transactions
   const { data: transactions, error: txErr } = await supabase
     .from("transactions")
     .select("amount, category")
@@ -48,12 +55,18 @@ export async function fetchMonthlyBreakdown(
     .gte("date", start.toISOString())
     .lte("date", end.toISOString());
 
-  if (txErr || !transactions) {
-    console.error("Transaction fetch error:", txErr?.message);
+  if (txErr) {
+    console.error("Transaction fetch error:", txErr.message);
+    if (txErr.message.toLowerCase().includes("jwt expired") && onTokenExpired) {
+      await onTokenExpired();
+      // Retry after refresh
+      return fetchMonthlyBreakdown(supabase, type, month, year, onTokenExpired);
+    }
     return { total: 0, percentage: 0, breakdown: [] };
   }
+  if (!transactions) return { total: 0, percentage: 0, breakdown: [] };
 
-  // 3. Group transactions by category name
+  // Group transactions by category name
   const grouped: Record<string, number> = {};
   for (const tx of transactions) {
     const cat = typeof tx.category === "string" ? JSON.parse(tx.category) : tx.category;
@@ -64,7 +77,7 @@ export async function fetchMonthlyBreakdown(
 
   const totalAmount = Object.values(grouped).reduce((sum, val) => sum + val, 0);
 
-  // 4. Build breakdown only for categories that were used
+  // Build breakdown only for categories with transactions
   const breakdown = categories
     .filter(cat => grouped[cat.name])
     .map((cat, i) => {

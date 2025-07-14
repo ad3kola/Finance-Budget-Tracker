@@ -1,21 +1,11 @@
 import { Database } from "@/lib/database.types";
 import { SupabaseClient } from "@supabase/supabase-js";
-import {format} from 'date-fns'
+import { format, parseISO } from "date-fns";
 
 const monthNameToIndex = (monthName: string) =>
   [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
   ].indexOf(monthName);
 
 export async function fetchStats(
@@ -24,7 +14,6 @@ export async function fetchStats(
   month: string,
   year: number
 ) {
-  console.log(month, year);
   const monthIndex = monthNameToIndex(month);
   if (monthIndex === -1) throw new Error("Invalid month name");
 
@@ -32,16 +21,39 @@ export async function fetchStats(
   const end = new Date(year, monthIndex + 1, 0);
   end.setHours(23, 59, 59, 999);
 
-  const { data, error } = await supabase
-    .from("transactions")
-    .select("date, amount")
-    .eq("type", type)
-    .gte("date", start.toISOString())
-    .lte("date", end.toISOString());
+  const fetchData = async () => {
+    const { data, error } = await supabase
+      .from("transactions")
+      .select("date, amount")
+      .eq("type", type)
+      .gte("date", start.toISOString())
+      .lte("date", end.toISOString());
 
-  if (error || !data) {
-    console.error("Transaction fetch error:", error?.message);
-    return {type, data: []};
+    if (error) {
+      if (error.message.includes("JWT expired")) {
+        // Attempt refresh
+        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+        console.log(refreshData)
+        if (refreshError) {
+          console.error("Refresh token error:", refreshError.message);
+          throw error; // Can't refresh, throw original error
+        }
+        return null; // Indicate to retry fetch
+      }
+      console.error("Transaction fetch error:", error.message);
+      throw error;
+    }
+    return data;
+  };
+
+  let data = await fetchData();
+
+  // Retry once after refresh
+  if (data === null) {
+    data = await fetchData();
+  }
+  if (!data) {
+    return { type, data: [] };
   }
 
   // Group by YYYY-MM-DD
@@ -53,7 +65,7 @@ export async function fetchStats(
   }
 
   const groupedArray = Object.entries(grouped).map(([date, total]) => ({
-    date: format(date, 'dd/MM'),
+    date: format(parseISO(date), "dd/MM"),
     total: +total.toFixed(2),
   }));
 
