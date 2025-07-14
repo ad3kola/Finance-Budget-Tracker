@@ -169,7 +169,7 @@ function Page() {
         <h3 className="w-full text-2xl">
           Welcome,
           <span className="ml-2 font-bold uppercase">
-            {user?.firstName ?? "Adekola"}!👋
+            {user?.firstName}!👋
           </span>
         </h3>
 
@@ -181,7 +181,6 @@ function Page() {
           onRefresh={() => setRefreshKey((p) => p + 1)}
         />
       </div>
-
       <div className="w-full grid grid-auto-cols-fr grid-cols-1 lg:grid-cols-3 gap-3">
         <ChartAreaGradient refresh={refreshKey} />
         <MonthlyBreakdown
