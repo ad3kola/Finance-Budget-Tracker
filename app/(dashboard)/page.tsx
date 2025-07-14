@@ -98,13 +98,17 @@ function Page() {
         </h3>
 
         {/* Sticky Date Picker Below Navbar */}
-        <div className="flex items-center w-full justify-between fixed border-b top-14 z-40 bg-background py-2">
+        <div className="flex flex-col-reverse gap-2 sm:flex-row items-center w-full justify-between fixed border-b top-14 z-40 bg-background py-2">
           <div className="flex items-center gap-2">
             <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <AlertDialogTrigger asChild>
-                <Button variant="outline" size="sm" className="group cursor-pointer">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="group cursor-pointer"
+                >
                   <PlusCircleIcon className="h-6 w-6 transition-transform duration-300 group-hover:rotate-360 group-hover:scale-125" />
-                  <span className="hidden md:inline-flex">New Transaction</span>
+                  New Transaction
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
@@ -128,16 +132,20 @@ function Page() {
               className="cursor-pointer group"
               variant="outline"
               size="sm"
-              onClick={() => setRefreshKey((p) => p + 1)}
+              onClick={() => {
+                setSelectedYear(currentYear);
+                setCurrentIndex(currentMonth);
+                setRefreshKey((p) => p + 1);
+              }}
             >
               <ArrowPathIcon className="h-5 w-5 transition-transform duration-300 group-hover:rotate-360" />
-              <span className="hidden md:inline-flex">Reset Date</span>
+              Reset Date
             </Button>
           </div>
-          <div className="flex items-center justify-end gap-1">
+          <div className="flex items-center gap-1">
             <Button
               variant="outline"
-              className="cursor-pointer border-none"
+              className="cursor-pointer "
               onClick={handlePrev}
             >
               <ChevronLeftIcon className="w-4 h-4" />
@@ -145,20 +153,20 @@ function Page() {
             <div className="flex items-center gap-1">
               <Button
                 variant="outline"
-                className="w-24 border-none h-9 rounded-sm cursor-default"
+                className="w-24 h-9 rounded-sm cursor-default"
               >
                 {allMonths[currentIndex]}
               </Button>
               <Button
                 variant="outline"
-                className="w-24 border-none h-9 rounded-sm cursor-default"
+                className="w-24 h-9 rounded-sm cursor-default"
               >
                 {selectedYear}
               </Button>
             </div>
             <Button
               variant="outline"
-              className="cursor-pointer border-none"
+              className="cursor-pointer "
               onClick={handleNext}
             >
               <ChevronRightIcon className="w-4 h-4" />
