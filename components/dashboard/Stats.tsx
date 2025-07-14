@@ -1,6 +1,11 @@
 "use client";
 
-import { EllipsisIcon, PackagePlusIcon, WalletIcon, BanknoteIcon, ShoppingCartIcon } from "lucide-react";
+import {
+  PackagePlusIcon,
+  WalletIcon,
+  BanknoteIcon,
+  ShoppingCartIcon,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -53,7 +58,8 @@ function StatsOverview({
   const { getClient } = useSupabaseClient();
   const [statsData, setStatsData] = useState<Stats | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [supabaseClient, setSupabaseClient] = useState<SupabaseClient<Database> | null>(null);
+  const [supabaseClient, setSupabaseClient] =
+    useState<SupabaseClient<Database> | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -194,20 +200,11 @@ function StatCard({ title, value, Icon, roi, valueChange }: StatsProps) {
   return (
     <Card className="py-4">
       <CardHeader className="pr-4">
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-2">
-            <Button size="sm" className="rounded-full">
-              <Icon />
-            </Button>
-            <CardTitle className="font-medium text-sm">{title}</CardTitle>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="rounded-full cursor-pointer"
-          >
-            <EllipsisIcon className="h-4 w-4" />
+        <div className="flex flex-col sm:flex-row items-center gap-2">
+          <Button size="sm" className="rounded-full">
+            <Icon />
           </Button>
+          <CardTitle className="font-medium text-sm">{title}</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="-mt-5">
