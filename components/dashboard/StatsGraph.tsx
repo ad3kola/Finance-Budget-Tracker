@@ -14,43 +14,67 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-];
+import { useEffect, useState } from "react";
+import { useSupabaseClient } from "@/lib/data/client";
+import { fetchStats } from "@/lib/data/dashboard/fetchStats";
 
 export default function StatsGraph({
   title,
   desc,
   type,
+  month,
+  year,
 }: {
   title: string;
+  year: number;
+  month: string;
   desc: string;
   type: "income" | "expense";
 }) {
-  const color = type === "income" ? "#22c55e" : "#f43f5e"; 
+  interface ChartData {
+    date: string;
+    total: number;
+  }
+  const [chartData, setChartData] = useState<ChartData[] | []>([]);
+
+  const color = type === "income" ? "#22c55e" : "#f43f5e";
   const gradientId = `fill-${type}`;
 
+  const { getClient } = useSupabaseClient();
   const chartConfig: ChartConfig = {
-    desktop: {
-      label: "Desktop",
+    total: {
+      label: "total",
       color,
     },
   };
+
+  useEffect(() => {
+    const fetch = async () => {
+      const supabase = await getClient();
+      try {
+        const res = await fetchStats(supabase, type, month, year);
+        if (res) {
+          setChartData(res.data);
+          console.log(res);
+        }
+      }
+      catch (err) {
+        console.log(err)
+      }
+    };
+    fetch();
+  }, [month, year, getClient, type]);
 
   return (
     <Card className="py-4 flex flex-col gap-3">
       <CardHeader className="pb-0">
         <CardTitle className="text-lg font-semibold">{title}</CardTitle>
-        <CardDescription className="text-sm text-muted-foreground">{desc}</CardDescription>
+        <CardDescription className="text-sm text-muted-foreground">
+          {desc}
+        </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
-        <ChartContainer config={chartConfig} className="h-[200px] w-full">
+        <ChartContainer config={chartConfig} className="max-h-[200px] w-full">
           <AreaChart data={chartData} margin={{ left: 12, right: 12 }}>
             <defs>
               <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -60,11 +84,10 @@ export default function StatsGraph({
             </defs>
             <CartesianGrid vertical={false} strokeDasharray="3 3" />
             <XAxis
-              dataKey="month"
+              dataKey="date"
               tickLine={false}
               axisLine={false}
               tickMargin={10}
-              tickFormatter={(value) => value.slice(0, 3)}
               style={{ fontSize: 12 }}
             />
             <ChartTooltip
@@ -73,7 +96,7 @@ export default function StatsGraph({
             />
             <Area
               type="linear"
-              dataKey="desktop"
+              dataKey="total"
               stroke={color}
               strokeWidth={2}
               fill={`url(#${gradientId})`}

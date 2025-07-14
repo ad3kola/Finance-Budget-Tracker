@@ -1,61 +1,61 @@
 import { Database } from "@/lib/database.types";
 import { SupabaseClient } from "@supabase/supabase-js";
+import {format} from 'date-fns'
 
-const monthNameToIndex = (monthName: string): number => {
-  return new Date(`${monthName} 1, 2000`).getMonth();
-};
+const monthNameToIndex = (monthName: string) =>
+  [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ].indexOf(monthName);
 
-export const fetchStats = async (
+export async function fetchStats(
   supabase: SupabaseClient<Database>,
+  type: "income" | "expense",
   month: string,
   year: number
-) => {
+) {
+  console.log(month, year);
   const monthIndex = monthNameToIndex(month);
-  const yearNum = year;
+  if (monthIndex === -1) throw new Error("Invalid month name");
 
-  const start = new Date(yearNum, monthIndex, 1);
-  const end = new Date(yearNum, monthIndex + 1, 0);
+  const start = new Date(year, monthIndex, 1);
+  const end = new Date(year, monthIndex + 1, 0);
   end.setHours(23, 59, 59, 999);
 
   const { data, error } = await supabase
     .from("transactions")
-    .select("*")
+    .select("date, amount")
+    .eq("type", type)
     .gte("date", start.toISOString())
     .lte("date", end.toISOString());
 
-  if (error) {
-    console.error("Transactions fetch error:", error.message);
-    return [];
+  if (error || !data) {
+    console.error("Transaction fetch error:", error?.message);
+    return {type, data: []};
   }
 
+  // Group by YYYY-MM-DD
+  const grouped: Record<string, number> = {};
 
-const parsedData = (data ?? []).map((tx) => ({
-    ...tx,
-    category:
-      typeof tx.category === "string"
-        ? JSON.parse(tx.category)
-        : tx.category,
+  for (const tx of data) {
+    const day = new Date(tx.date).toISOString().split("T")[0]; // "YYYY-MM-DD"
+    grouped[day] = (grouped[day] || 0) + tx.amount;
+  }
+
+  const groupedArray = Object.entries(grouped).map(([date, total]) => ({
+    date: format(date, 'dd/MM'),
+    total: +total.toFixed(2),
   }));
 
-  const totalEarnings = (parsedData ?? [])
-    .filter((tx) => tx.type === "income")
-    .reduce((sum, tx) => sum + Number(tx.amount), 0);
-
-  const totalExpenses = (parsedData ?? [])
-    .filter((tx) => tx.type === "expense")
-    .reduce((sum, tx) => sum + Number(tx.amount), 0);
-
-  console.log({
-    month: `${month} ${year}`,
-    totalEarnings,
-    totalExpenses,
-    transactions: parsedData ?? [],
-  });
-
-  return [
-      {month: `${month} ${year}`,
-      totalEarnings,
-      totalExpenses,
-      transactions: parsedData ?? [],}
-  ];
-};
+  return { type, data: groupedArray };
+}

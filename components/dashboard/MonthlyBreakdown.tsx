@@ -16,7 +16,7 @@ import {
 import { Button } from "../ui/button";
 import { PlusCircleIcon, PlusIcon } from "lucide-react";
 import CreateCategory from "./CreateCategory";
-import { fetchBreakdown } from "@/lib/data/dashboard/fetchMonthlyBreakdowns";
+import { fetchMonthlyBreakdown } from "@/lib/data/dashboard/fetchMonthlyBreakdowns";
 
 interface Income {
   total: number;
@@ -32,21 +32,30 @@ interface Income {
 function MonthlyBreakdown({
   type,
   refresh,
+  month,
+  year,
 }: {
   type: "income" | "expense";
   refresh?: number;
+  month: string;
+  year: number;
 }) {
+
   const { getClient } = useSupabaseClient();
   const [data, setData] = useState<Income | null>(null);
   const [open, setOpen] = useState(false);
-
-  console.log(open);
+  console.log(open)
 
   const loadBreakdown = useCallback(async () => {
     const supabase = await getClient();
-    const res = await fetchBreakdown(supabase, type);
+    const res = await fetchMonthlyBreakdown(
+      supabase,
+      type,
+      month,
+      year
+    );
     setData(res);
-  }, [getClient, type]);
+  }, [getClient, type, month, year]);
 
   useEffect(() => {
     loadBreakdown();
@@ -74,7 +83,7 @@ function MonthlyBreakdown({
               type={type}
               onSuccess={async () => {
                 await loadBreakdown();
-                setOpen(false); // ✅ close modal after submit
+                setOpen(false);
               }}
             />
             <AlertDialogFooter>

@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  EllipsisIcon,
-  PackagePlusIcon,
-  WalletIcon,
-} from "lucide-react";
+import { EllipsisIcon, PackagePlusIcon, WalletIcon, BanknoteIcon, ShoppingCartIcon } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -18,7 +14,6 @@ import { Separator } from "../ui/separator";
 import { useEffect, useState } from "react";
 import { fetchStats } from "@/lib/data/dashboard/fetchStats";
 import { useSupabaseClient } from "@/lib/data/client";
-import { format, setMonth, setYear } from "date-fns";
 
 import {
   AlertDialog,
@@ -27,11 +22,7 @@ import {
   AlertDialogFooter,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  ArrowPathIcon,
-  ChevronDoubleLeftIcon,
-  ChevronDoubleRightIcon,
-} from "@heroicons/react/20/solid";
+import { ArrowPathIcon } from "@heroicons/react/20/solid";
 import CreateDialogBox from "@/components/CreateDialogBox";
 import { PlusCircleIcon } from "lucide-react";
 import { SupabaseClient } from "@supabase/supabase-js";
@@ -45,81 +36,69 @@ interface Stats {
   transactions: TransactionsProps[];
 }
 
+const getTotal = (arr: { total: number }[]) =>
+  arr.reduce((sum, item) => sum + item.total, 0);
+
 function StatsOverview({
   refresh,
   onRefresh,
+  month,
+  year,
 }: {
   refresh?: number;
+  month: string;
+  year: number;
   onRefresh?: () => void;
 }) {
   const { getClient } = useSupabaseClient();
   const [statsData, setStatsData] = useState<Stats | null>(null);
-console.log(statsData)
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
+  const [supabaseClient, setSupabaseClient] = useState<SupabaseClient<Database> | null>(null);
 
-  const [selectedYear, setSelectedYear] = useState(currentYear);
-  const [currentIndex, setCurrentIndex] = useState(currentMonth);
-  const [supabaseClient, setSupabaseClient] =
-    useState<SupabaseClient<Database> | null>(null);
-
-  const monthName = format(new Date(selectedYear, currentIndex, 1), "MMMM");
-  const handlePrev = () => {
-    if (currentIndex === 0) {
-      if (selectedYear > 2023) {
-        setSelectedYear((prev) => prev - 1);
-        setCurrentIndex(11); // December
-      }
-    } else {
-      setCurrentIndex((prev) => prev - 1);
-    }
-  };
-
-  const handleNext = () => {
-    const isCurrentYear = selectedYear === currentYear;
-    const maxMonth = isCurrentYear ? currentMonth : 11;
-
-    if (currentIndex === maxMonth) {
-      if (!isCurrentYear) {
-        setSelectedYear((prev) => prev + 1);
-        setCurrentIndex(0); // January
-      }
-    } else {
-      setCurrentIndex((prev) => prev + 1);
-    }
-  };
+  useEffect(() => {
+    const init = async () => {
+      const client = await getClient();
+      setSupabaseClient(client);
+    };
+    init();
+  }, [getClient]);
 
   useEffect(() => {
     const fetch = async () => {
       const supabase = await getClient();
       setSupabaseClient(supabase);
-      const monthName = format(new Date(selectedYear, currentIndex, 1), "MMMM");
-      const data = await fetchStats(supabase, monthName, selectedYear);
-      setStatsData(data[0]);
+
+      const [incomeStats, expenseStats] = await Promise.all([
+        fetchStats(supabase, "income", month, year),
+        fetchStats(supabase, "expense", month, year),
+      ]);
+
+      setStatsData({
+        month,
+        totalEarnings: getTotal(incomeStats.data),
+        totalExpenses: getTotal(expenseStats.data),
+        transactions: [],
+      });
     };
+
     fetch();
-  }, [currentIndex, selectedYear, getClient, refresh]);
-  const allMonths = Array.from({ length: 12 }, (_, i) =>
-    format(setMonth(setYear(new Date(), selectedYear), i), "MMMM")
-  );
+  }, [year, month, getClient, refresh]);
 
   const data: StatsProps[] = [
-    // {
-    //   title: "Earnings Overview",
-    //   value: statsData?.totalEarnings ?? 0,
-    //   Icon: Banknote,
-    //   roi: 0,
-    //   valueChange: 0,
-    // },
-    // {
-    //   title: "Total Expenses",
-    //   value: statsData?.totalExpenses ?? 0,
-    //   Icon: ShoppingCartIcon,
-    //   roi: 0,
-    //   valueChange: 0,
-    // },
+    {
+      title: "Earnings Overview",
+      value: statsData?.totalEarnings ?? 0,
+      Icon: BanknoteIcon,
+      roi: 0,
+      valueChange: 0,
+    },
+    {
+      title: "Total Expenses",
+      value: statsData?.totalExpenses ?? 0,
+      Icon: ShoppingCartIcon,
+      roi: 0,
+      valueChange: 0,
+    },
     {
       title: "Current Savings",
       value: 0,
@@ -139,39 +118,6 @@ console.log(statsData)
   return (
     <div className="flex w-full flex-col gap-2">
       <div className="flex items-center w-full justify-between">
-        <div className="flex items-center justify-end gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="cursor-pointer"
-            onClick={handlePrev}
-          >
-            <ChevronDoubleLeftIcon className="w-4 h-4" />
-          </Button>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              className="w-24 h-9 border-b border-foreground rounded-sm cursor-default"
-            >
-              {allMonths[currentIndex]}
-            </Button>
-
-            <Button
-              variant="ghost"
-              className="w-16 h-9 border-b border-foreground rounded-sm cursor-default"
-            >
-              {selectedYear}
-            </Button>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="cursor-pointer"
-            onClick={handleNext}
-          >
-            <ChevronDoubleRightIcon className="w-4 h-4" />
-          </Button>
-        </div>
         <div className="flex items-center gap-2">
           <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <AlertDialogTrigger asChild>
@@ -190,13 +136,17 @@ console.log(statsData)
                   supabase={supabaseClient}
                   onSuccess={async () => {
                     setIsDialogOpen(false);
-                    const refreshed = await fetchStats(
-                      supabaseClient,
-                      monthName,
-                      selectedYear
-                    );
-                    setStatsData(refreshed[0]);
-                    onRefresh?.(); // trigger external refresh (e.g., RecentTransactions, ChartAreaGradient)
+                    const [incomeStats, expenseStats] = await Promise.all([
+                      fetchStats(supabaseClient, "income", month, year),
+                      fetchStats(supabaseClient, "expense", month, year),
+                    ]);
+                    setStatsData({
+                      month,
+                      totalEarnings: getTotal(incomeStats.data),
+                      totalExpenses: getTotal(expenseStats.data),
+                      transactions: [],
+                    });
+                    onRefresh?.();
                   }}
                 />
               )}
@@ -213,24 +163,29 @@ console.log(statsData)
           </Button>
         </div>
       </div>
-       <div className="w-full grid grid-cols-1 gap-3 md:grid-cols-3">
-        <StatsGraph
-          title="User Activity Overview"
-          type="income"
-          desc=" Desktop user visits over the past six months"
-        />
-        <StatsGraph
-          title="User Activity Overview"
-          type="expense"
-          desc=" Desktop user visits over the past six months"
-        />
-        <div className="w-full grid grid-auto-cols-fr grid-cols-2 sm:grid-cols-1 gap-3">
-        {data.map((item) => (
-          <StatCard key={item.title} {...item} />
-        ))}
+      <div className="w-full grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div className="md:col-span-2 grid sm:grid-cols-2 gap-3">
+          <StatsGraph
+            month={month}
+            year={year}
+            title="Earnings Breakdown"
+            type="income"
+            desc="Income distribution for the current month."
+          />
+          <StatsGraph
+            month={month}
+            year={year}
+            title="Spending Breakdown"
+            type="expense"
+            desc="Expenses categorized for the current month."
+          />
+        </div>
+        <div className="w-full grid grid-auto-cols-fr grid-cols-2 md:grid-cols-1 gap-3">
+          {data.map((item) => (
+            <StatCard key={item.title} {...item} />
+          ))}
+        </div>
       </div>
-      </div>
-      
     </div>
   );
 }
