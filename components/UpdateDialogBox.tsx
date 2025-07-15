@@ -5,6 +5,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { parse } from "date-fns";
 import { cn, IconMap } from "@/lib/utils";
 import { useAuth, useUser } from "@clerk/nextjs";
 
@@ -30,24 +31,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CategoryItem } from "@/lib/types";
+import { CategoryItem, TransactionsProps } from "@/lib/types";
 import { Calendar } from "@/components/ui/calendar";
 import { useEffect, useState } from "react";
 import { createSupabaseClient } from "@/config/supabase-client";
 import { Button } from "./ui/button";
-import { Database } from "@/lib/database.types";
-import { SupabaseClient } from "@supabase/supabase-js";
 import { fetchCategories } from "@/lib/data/dashboard/fetchCategories";
 import { CalendarIcon, ClipboardCheckIcon, DollarSignIcon } from "lucide-react";
+import { useSupabaseClient } from "@/lib/data/client";
+import { fetchTransactionByID } from "@/lib/data/dashboard/fetchTransactions";
 
-export default function CreateDialogBox({
+export default function UpdateDialogBox({
   onSuccess,
-  supabase,
+  id,
 }: {
-  supabase: SupabaseClient<Database> | null;
   onSuccess: () => void;
+  id: number;
 }) {
   const { getToken } = useAuth();
+  const { getClient } = useSupabaseClient();
 
   const { user, isSignedIn } = useUser();
 
@@ -59,22 +61,66 @@ export default function CreateDialogBox({
     []
   );
 
+  const [transaction, setTransaction] = useState<TransactionsProps | null>(
+    null
+  );
+
+  useEffect(() => {
+    const fetch = async () => {
+      const supabase = await getClient();
+
+      try {
+        const res = await fetchTransactionByID(supabase, id);
+        if (res) {
+          setTransaction(res[0]);
+          console.log(res);
+        }
+      } catch (err) {
+        console.error("Error fetching transaction:", err);
+      }
+    };
+    fetch();
+  }, [id, getClient]);
+
   const form = useForm<z.infer<typeof transactionSchema>>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
-      amount: 0.0,
+      amount: 0,
       category: null,
       date: new Date(),
       description: "",
-      type: "income",
+      type: "expense",
     },
   });
+
   const {
     reset,
     formState: { errors },
   } = form;
 
   console.log(errors);
+
+  useEffect(() => {
+    if (transaction) {
+      const parsedDate = parse(transaction.date, "MMMM do, yyyy", new Date());
+      if (isNaN(parsedDate.getTime())) {
+        console.error("Invalid date format:", transaction.date);
+        return;
+      }
+
+      reset({
+        amount: transaction.amount,
+        category: transaction.category,
+        date: parsedDate,
+        description: transaction.description,
+        type: transaction.type as "income" | "expense",
+      });
+
+      setActiveCategory(transaction.category);
+
+      form.setValue("category", transaction.category);
+    }
+  }, [transaction, reset, form]);
 
   async function onSubmit(values: z.infer<typeof transactionSchema>) {
     if (!user || !isSignedIn) return;
@@ -109,17 +155,32 @@ export default function CreateDialogBox({
   console.log(activeCategory);
   const type = form.watch("type");
 
-  useEffect(() => {
-    const fetch = async () => {
-      if (supabase) {
-        const res = await fetchCategories(supabase, type);
-        setActiveCategoryList(res);
+const { getValues, setValue } = form;
+
+useEffect(() => {
+  const fetch = async () => {
+    const supabase = await getClient();
+    if (supabase) {
+      const res = await fetchCategories(supabase, type);
+      setActiveCategoryList(res);
+
+      const currentCategory = getValues("category");
+
+      const categoryExists = res.some(
+        (cat) =>
+          cat.name === currentCategory?.name && cat.Icon === currentCategory?.Icon
+      );
+
+      if (!categoryExists) {
         setActiveCategory(null);
-        form.setValue("category", null);
+        setValue("category", null);
+      } else {
+        setActiveCategory(currentCategory);
       }
-    };
-    fetch();
-  }, [supabase, type, form]);
+    }
+  };
+  fetch();
+}, [type, getClient, getValues, setValue]);
 
   return (
     <Form {...form}>
@@ -217,11 +278,27 @@ export default function CreateDialogBox({
                               render={() => (
                                 <FormItem>
                                   <Select
+                                    value={
+                                      activeCategory
+                                        ? JSON.stringify(activeCategory)
+                                        : ""
+                                    }
                                     onValueChange={(val) => {
-                                      const parsed = JSON.parse(val);
-                                      form.setValue("category", parsed);
-                                      setActiveCategory(parsed);
-                                      console.log(parsed);
+                                      if (!val) {
+                                        form.setValue("category", null);
+                                        setActiveCategory(null);
+                                        return;
+                                      }
+                                      try {
+                                        const parsed = JSON.parse(val);
+                                        form.setValue("category", parsed);
+                                        setActiveCategory(parsed);
+                                      } catch (error) {
+                                        console.error(
+                                          "Error parsing category:",
+                                          error
+                                        );
+                                      }
                                     }}
                                   >
                                     <FormControl>

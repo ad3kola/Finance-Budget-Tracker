@@ -64,7 +64,9 @@ export async function fetchStats(
     grouped[day] = (grouped[day] || 0) + tx.amount;
   }
 
-  const groupedArray = Object.entries(grouped).map(([date, total]) => ({
+  const groupedArray = Object.entries(grouped)
+  .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime()) // sort by date
+  .map(([date, total]) => ({
     date: format(parseISO(date), "dd/MM"),
     total: +total.toFixed(2),
   }));

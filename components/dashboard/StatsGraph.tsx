@@ -96,7 +96,7 @@ export default function StatsGraph({
 
       <CardContent className="pt-0">
         <ChartContainer config={chartConfig} className="max-h-[200px] w-full">
-          <AreaChart data={chartData} margin={{ left: 12, right: 12 }}>
+          <AreaChart data={chartData} margin={{ left: 18, right: 18 }}>
             <defs>
               <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={color} stopOpacity={0.7} />
@@ -107,8 +107,10 @@ export default function StatsGraph({
             <XAxis
               dataKey="date"
               tickLine={false}
+              interval={0}
               axisLine={false}
               tickMargin={10}
+              scale={"point"}
               style={{ fontSize: 12 }}
             />
             <ChartTooltip

@@ -1,12 +1,23 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { TransactionsProps } from "@/lib/types";
 import { cn, IconMap } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 
 import { ArrowUpDown, EditIcon, TrashIcon } from "lucide-react";
+import UpdateDialogBox from "@/components/UpdateDialogBox";
 
 export const columns = (
   onDelete: (id: number) => void
@@ -35,14 +46,14 @@ export const columns = (
   },
   {
     accessorKey: "date",
-    header: () => (
-      <h3 className="text-sm font-medium flex items-center gap-2">
+    header: ({ column }) => (
+      <button
+        className="text-sm font-medium flex items-center gap-2"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
         Date <ArrowUpDown className="h-4 w-4" />
-      </h3>
+      </button>
     ),
-    cell: ({ row }) => {
-      return <div className="font-medium ">{row.getValue("date")}</div>;
-    },
   },
   {
     accessorKey: "category",
@@ -54,11 +65,11 @@ export const columns = (
       const LucideIcon = IconMap[Icon as keyof typeof IconMap];
       return (
         <div className="flex items-center gap-3 max-w-48 truncate capitalize font-medium">
-          <Button size={'icon'}>
+          <div className="w-6 h-6 flex items-center justify-center text-muted-foreground">
             {(() => {
               return LucideIcon ? <LucideIcon className="w-4 h-4" /> : null;
             })()}
-          </Button>
+          </div>
           <span>{name}</span>
         </div>
       );
@@ -103,7 +114,11 @@ export const columns = (
             row.getValue("type") == "income" ? "text-green-500" : "text-red-500"
           )}
         >
-          ${value.toFixed(2).toLocaleString()}
+          $
+          {value.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
         </div>
       );
     },
@@ -115,20 +130,41 @@ export const columns = (
       const transaction = row.original;
       return (
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => onDelete(transaction.id)}
-          >
-            <TrashIcon />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => onDelete(transaction.id)}
-          >
-            <EditIcon />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => onDelete(transaction.id)}
+              >
+                <TrashIcon />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="font-semibold tracking-wide medium text-xs">
+                Delete
+              </p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <EditIcon />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <UpdateDialogBox onSuccess={() => {}} id={transaction.id} />
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-xs font-semibold tracking-wide">Edit</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
       );
     },

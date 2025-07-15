@@ -13,19 +13,6 @@ export default function DemoPage() {
   );
   const { getClient } = useSupabaseClient();
 
-  // const updateTransactionByID = async (id: number) => {
-  //   const token = await getToken({ template: "supabase" });
-  //   const supabase = createSupabaseClient(token);
-  //   console.log(id);
-  //   await supabase
-  //     .from("transactions")
-  //     .delete()
-  //     .eq('id', id);
-
-  //   fetchTransactions();
-  //   console.log('done')
-  // };
-
   const loadTransactions = useCallback(async () => {
     const supabase = await getClient();
     const res = await fetchAllTransactions(supabase);
