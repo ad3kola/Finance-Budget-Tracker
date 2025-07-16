@@ -35,7 +35,7 @@ import { CategoryItem, TransactionsProps } from "@/lib/types";
 import { Calendar } from "@/components/ui/calendar";
 import { useEffect, useState } from "react";
 import { createSupabaseClient } from "@/config/supabase-client";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { fetchCategories } from "@/lib/data/dashboard/fetchCategories";
 import { CalendarIcon, ClipboardCheckIcon, DollarSignIcon } from "lucide-react";
 import { useSupabaseClient } from "@/lib/data/client";
@@ -155,32 +155,33 @@ export default function UpdateDialogBox({
   console.log(activeCategory);
   const type = form.watch("type");
 
-const { getValues, setValue } = form;
+  const { getValues, setValue } = form;
 
-useEffect(() => {
-  const fetch = async () => {
-    const supabase = await getClient();
-    if (supabase) {
-      const res = await fetchCategories(supabase, type);
-      setActiveCategoryList(res);
+  useEffect(() => {
+    const fetch = async () => {
+      const supabase = await getClient();
+      if (supabase) {
+        const res = await fetchCategories(supabase, type);
+        setActiveCategoryList(res);
 
-      const currentCategory = getValues("category");
+        const currentCategory = getValues("category");
 
-      const categoryExists = res.some(
-        (cat) =>
-          cat.name === currentCategory?.name && cat.Icon === currentCategory?.Icon
-      );
+        const categoryExists = res.some(
+          (cat) =>
+            cat.name === currentCategory?.name &&
+            cat.Icon === currentCategory?.Icon
+        );
 
-      if (!categoryExists) {
-        setActiveCategory(null);
-        setValue("category", null);
-      } else {
-        setActiveCategory(currentCategory);
+        if (!categoryExists) {
+          setActiveCategory(null);
+          setValue("category", null);
+        } else {
+          setActiveCategory(currentCategory);
+        }
       }
-    }
-  };
-  fetch();
-}, [type, getClient, getValues, setValue]);
+    };
+    fetch();
+  }, [type, getClient, getValues, setValue]);
 
   return (
     <Form {...form}>

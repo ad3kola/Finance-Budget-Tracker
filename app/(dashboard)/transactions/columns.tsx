@@ -17,7 +17,7 @@ import { cn, IconMap } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 
 import { ArrowUpDown, EditIcon, TrashIcon } from "lucide-react";
-import UpdateDialogBox from "@/components/UpdateDialogBox";
+import UpdateDialogBox from "@/components/transactions/UpdateDialogBox";
 
 export const columns = (
   onDelete: (id: number) => void
