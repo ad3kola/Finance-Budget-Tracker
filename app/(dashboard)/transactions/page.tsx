@@ -31,13 +31,21 @@ export default function DemoPage() {
   }, [getClient, loadTransactions]);
 
   return (
-    <div className="mx-auto p-4 w-full overflow-x-hidden">
-      {transactions && (
-        <DataTable
-          columns={columns(deleteTransactionByID)}
-          data={transactions}
-        />
-      )}
+    <div className="flex flex-col gap-2 items-start p-2 md:p-4">
+      <div className="flex flex-col gap-1 items-start">
+        <h1 className="text-2xl font-bold">Transactions</h1>
+        <p className="text-muted-foreground">
+          View and manage your transactions.
+        </p>
+      </div>
+      <div className="mx-auto w-full overflow-x-hidden">
+        {transactions && (
+          <DataTable
+            columns={columns(deleteTransactionByID)}
+            data={transactions}
+          />
+        )}
+      </div>
     </div>
   );
 }
