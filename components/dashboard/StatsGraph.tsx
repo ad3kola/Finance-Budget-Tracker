@@ -89,7 +89,7 @@ export default function StatsGraph({
               "md:text-xl font-semibold py-1 rounded-md px-3 w-fit h-fit"
             )}
           >
-            ${selectedValue}
+            ${selectedValue?.toFixed(2)}
           </div>
         </div>
       </CardHeader>

@@ -133,4 +133,22 @@
     max-width: 200px; /* adjust width as needed */
     word-break: break-word;
   }
+  @keyframes autoplay-progress {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .autoplay-progress-bar {
+    animation: autoplay-progress 3s linear forwards;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -100%;
+    width: 100%;
+    background-color: white; /* or your desired color */
+  }
 }

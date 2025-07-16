@@ -24,20 +24,25 @@ const items: Items[] = [
   { label: "Manage", link: "/manage" },
 ];
 
-function Navbar() {
+function Navbar({ className }: { className?: string }) {
   return (
     <>
-      <DesktopNavbar />
-      <MobileNavbar />
+      <DesktopNavbar className={className} />
+      <MobileNavbar className={className} />
     </>
   );
 }
 
-function MobileNavbar() {
+function MobileNavbar({ className }: { className?: string }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
-    <div className="fixed top-0 left-0 right-0 w-full h-14 border-b bg-background shadow-md z-50 md:hidden">
+    <div
+      className={cn(
+        className,
+        "w-full h-full border-b bg-background shadow-md z-50 md:hidden"
+      )}
+    >
       <nav className="container flex items-center justify-between p-2">
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
@@ -70,17 +75,25 @@ function MobileNavbar() {
   );
 }
 
-function DesktopNavbar() {
+function DesktopNavbar({ className }: { className?: string }) {
   return (
-    <div className="hidden fixed top-0 left-0 right-0 h-14 border-b bg-background shadow-md z-50 md:flex items-center px-4">
-      <Logo />
-      <div className="flex items-center gap-x-3 flex-1 justify-end">
-        <div className="flex items-center">
+    <div
+      className={cn(
+        className,
+        "hidden border-r bg-background shadow-md z-50 md:flex flex-col items-start p-4 gap-4 border"
+      )}
+    >
+      {/* <Logo /> */}
+      <h3 className="font-bold text-2xl bg-clip-text bg-gradient-to-r from-yellow-600 to-yellow-300 text-transparent flex-shrink-0">
+        Budget Tracker
+      </h3>
+      <div className="flex flex-col items-start gap-3 flex-grow h-full w-full">
+        <div className="flex flex-col items-start flex-grow gap-2 w-full">
           {items.map((item) => (
             <NavbarItem key={item.label} label={item.label} link={item.link} />
           ))}
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mt-auto">
           <ModeToggle />
           <UserButton afterSignOutUrl="/sign-in" />
         </div>
@@ -94,12 +107,12 @@ function NavbarItem({ link, label, clickCallback }: Items) {
   const isActive = pathname === link;
 
   return (
-    <div className="relative px-3 flex items-center">
+    <div className="relative px-3 flex items-center w-full">
       <Link
         href={link}
         className={cn(
-          buttonVariants({ variant: "ghost" }),
-          "w-full justify-center text-muted-foreground",
+          buttonVariants({ variant: isActive ? 'outline' : 'ghost' }),
+          "w-full justify-center h-10 text-base text-muted-foreground rounded-md",
           isActive && "text-foreground"
         )}
         onClick={() => {
@@ -109,7 +122,7 @@ function NavbarItem({ link, label, clickCallback }: Items) {
         {label}
       </Link>
       {isActive && (
-        <div className="absolute -bottom-[2px] left-1/2 hidden h-[2px] w-[70%] rounded-xl md:block -translate-x-1/2 bg-foreground" />
+        <div className="bg-input/30 " />
       )}
     </div>
   );

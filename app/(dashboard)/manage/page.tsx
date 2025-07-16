@@ -1,13 +1,15 @@
-
 import CardCarousel from "@/components/manage/CardCarousel";
+import TotalBalance from "@/components/manage/TotalBalance";
 
 function page() {
   return (
-    <main className="p-2">
-      <div className="grid grid-cols-1 md:grid-cols-3">
-        <CardCarousel />
-        <div className="col-span-1 md:col-span-2"></div>
+    <main className="p-2 grid grid-cols-4 w-full h-full gap-2">
+      <div className="col-span-3">
+        <TotalBalance />
       </div>
+      <div className="col-span-1 w-full ">
+          <CardCarousel />
+        </div>
     </main>
   );
 }

@@ -35,7 +35,7 @@ const chartConfig = {
   },
   expenses: {
     label: "Expenses",
-    color: "var(--foreground)",
+    color: "#f43f5e",
   },
 } satisfies ChartConfig;
 
@@ -78,8 +78,8 @@ export default function ChartAreaGradient({ refresh }: { refresh?: number }) {
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <ChartLegend content={<ChartLegendContent />} />
-            <Bar dataKey="expenses" fill="var(--color-expenses)" radius={4} />
             <Bar dataKey="income" fill="var(--color-income)" radius={4} />
+            <Bar dataKey="expenses" fill="var(--color-expenses)" radius={4} />
           </BarChart>
         </ChartContainer>
       </CardContent>
