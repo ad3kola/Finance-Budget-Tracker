@@ -40,7 +40,7 @@ function MobileNavbar({ className }: { className?: string }) {
     <div
       className={cn(
         className,
-        "w-full h-full border-b bg-background shadow-md z-50 md:hidden"
+        "fixed top-0 left-0 right-0 w-full h-14 border-b bg-background shadow-md z-50 lg:hidden border"
       )}
     >
       <nav className="container flex items-center justify-between p-2">
@@ -80,7 +80,7 @@ function DesktopNavbar({ className }: { className?: string }) {
     <div
       className={cn(
         className,
-        "hidden border-r bg-background shadow-md z-50 md:flex flex-col items-start p-4 gap-4 border"
+        "hidden border-r bg-background shadow-lg z-50 lg:flex flex-col items-start p-4 gap-4 border"
       )}
     >
       {/* <Logo /> */}

@@ -89,7 +89,7 @@ function Page() {
 
   return (
     <div className="w-full h-full flex flex-col gap-3 overflow-auto">
-      <div className="flex flex-col-reverse gap-2 sm:flex-row items-center w-full justify-between sticky top-0 right-0 border-b z-40 backdrop-blur-md bg-white/10 dark:bg-zinc-900/10 sm:px-4 py-2">
+      <div className="flex flex-col-reverse gap-2 sm:flex-row items-center w-full justify-between sticky top-0 right-0 border-b z-40 backdrop-blur-md pt-16 bg-white/10 dark:bg-zinc-900/10 sm:px-4 md:py-2">
         <div className="flex items-center gap-2">
           <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <AlertDialogTrigger asChild>
